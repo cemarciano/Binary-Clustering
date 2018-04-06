@@ -5,8 +5,8 @@
 #include "Bitmask.h"		// Array class for storing bits
 
 #define N 6000000			// Size of data
-#define K 20				// Dimension of data
-#define CORES 4 			// Number of CPUs
+#define K 21				// Dimension of data
+#define CORES 1 			// Number of CPUs
 
 using namespace std;
 
@@ -81,12 +81,12 @@ data_t** generateRandomMatrix(){
 void fillLines(int threadId, data_t** matrix){
 
     // Randomizes interval of data for each thread:
-    int interval = ((int)&threadId)*threadId*7 % 200;
+    int interval = (threadId+1)*263 % 200;
 
 	// Number of columns to fill:
 	int each = K / CORES;
 
-	uniform_int_distribution<int> dice_distribution(-interval, interval);
+	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
 	mt19937 random_number_engine; // pseudorandom number generator
 	auto dice_roller = bind(dice_distribution, random_number_engine);
 
