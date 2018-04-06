@@ -18,6 +18,7 @@ data_t** generateRandomMatrix();
 void fillLines(int threadId, data_t** matrix);
 void binaryClustering(data_t** matrix);
 void findCentroids(int threadId, data_t* centroids, data_t** matrix);
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix);
 
 
 // Main program:
@@ -40,6 +41,7 @@ int main(){
     double elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 	cout << endl << "Elapsed time: " << elapsed << " seconds." << endl;
+
 
 }
 
@@ -81,8 +83,8 @@ void fillLines(int threadId, data_t** matrix){
     // Randomizes interval of data for each thread:
     int interval = 15241*threadId % 200 - 100;
 
-    // Linear congruent generator:
-    int gen = (15245 + 12345) % interval;
+    // Linear congruent generator starting seed:
+    int gen = 27590 % interval;
 
 	// Number of columns to fill:
 	int each = K / CORES;
@@ -93,7 +95,7 @@ void fillLines(int threadId, data_t** matrix){
 		for (int i = 0; i < N; i++){
 			// Fills in random data:
             gen = (1664521*gen + 12341) % interval;
-			matrix[j][i] = gen;
+			matrix[j][i] = 1+i;//gen;
 		}
 	}
 
@@ -127,6 +129,30 @@ void binaryClustering(data_t** matrix){
         cout << centroids[i] << " - ";
     }
 
+    /************************/
+    /*** SIMILARITY CHECK ***/
+    /************************/
+
+    // Bitmask to hold unused similarity combinations:
+    Bitmask bitmask(pow(2,K+1), false);
+    // To access an index: bitmask.put(i + 2*j + 4*k + 2^n*k)
+
+    // Array of threads:
+	std::thread similarityTasks[CORES];
+
+	// Loops through threads:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		// Fires up thread to fill matrix:
+		similarityTasks[threadId] = thread(removeSimilar, threadId, centroids, &bitmask, matrix);
+	}
+
+	// Waits until all threads are done:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		similarityTasks[threadId].join();
+	}
+
+    cout << endl << "Total items: " << bitmask.getSize() << endl;
+
 }
 
 void findCentroids(int threadId, data_t* centroids, data_t** matrix){
@@ -142,8 +168,34 @@ void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 		for (int i = 0; i < N; i++){
             acc += matrix[j][i];
         }
-        // Write accumulator mean:
+        // Writes accumulator mean:
         centroids[j] = acc / N;
     }
 
+}
+
+
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix){
+
+    // Number of lines to check:
+	int each = N / CORES;
+
+    // Loops through designated lines:
+	for (int i = threadId*each; i < threadId*each + each; i++){
+        // Memory position accumulator:
+        int memAcc = 1;
+        // Loops through columns:
+        for (int j = 0; j < K; j++){
+            // Checks where data is positioned in regards to centroid:
+            if (matrix[j][i] > centroids[j]){
+                // Moves the memory position further:
+                memAcc += pow(2,j);
+            }
+        }
+        // Check if similar data has not yet been found:
+        if (bitmask->get(memAcc) == false){
+            // Marks data as found:
+            bitmask->put(memAcc, true);
+        }
+    }
 }
