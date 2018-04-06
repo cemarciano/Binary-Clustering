@@ -81,21 +81,22 @@ data_t** generateRandomMatrix(){
 void fillLines(int threadId, data_t** matrix){
 
     // Randomizes interval of data for each thread:
-    int interval = 15241*threadId % 200 - 100;
-
-    // Linear congruent generator starting seed:
-    int gen = 27590 % interval;
+    int interval = ((int)&threadId)*threadId*7 % 200;
 
 	// Number of columns to fill:
 	int each = K / CORES;
+
+	uniform_int_distribution<int> dice_distribution(-interval, interval);
+	mt19937 random_number_engine; // pseudorandom number generator
+	auto dice_roller = bind(dice_distribution, random_number_engine);
 
 	// Loops through designated columns:
 	for (int j = threadId*each; j < threadId*each + each; j++){
 		// Loops through lines:
 		for (int i = 0; i < N; i++){
 			// Fills in random data:
-            gen = (1664521*gen + 12341) % interval;
-			matrix[j][i] = 1+i;//gen;
+            //gen = (1664521*gen + 12341) % interval;
+			matrix[j][i] = dice_roller();
 		}
 	}
 
