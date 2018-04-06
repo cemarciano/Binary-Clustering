@@ -17,7 +17,7 @@ typedef double data_t;
 data_t** generateRandomMatrix();
 void fillLines(int threadId, data_t** matrix);
 void binaryClustering(data_t** matrix);
-void sumForCentroids(int threadId, data_t* centroids, data_t** matrix);
+void findCentroids(int threadId, data_t* centroids, data_t** matrix);
 
 
 // Main program:
@@ -114,7 +114,7 @@ void binaryClustering(data_t** matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		centroidTasks[threadId] = thread(sumForCentroids, threadId, centroids, matrix);
+		centroidTasks[threadId] = thread(findCentroids, threadId, centroids, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -122,25 +122,28 @@ void binaryClustering(data_t** matrix){
 		centroidTasks[threadId].join();
 	}
 
-    // Divides the sums by K to find centroid values:
+    // Prints centroid values:
     for (int i = 0; i < K; i++){
-        centroids[i] /= N;
         cout << centroids[i] << " - ";
     }
 
 }
 
-void sumForCentroids(int threadId, data_t* centroids, data_t** matrix){
+void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 
     // Number of columns to sum:
 	int each = K / CORES;
 
     // Loops through designated columns:
 	for (int j = threadId*each; j < threadId*each + each; j++){
+        // Accumulator:
+        data_t acc = 0;
         // Loops through lines:
 		for (int i = 0; i < N; i++){
-            centroids[j] += matrix[j][i];
+            acc += matrix[j][i];
         }
+        // Write accumulator mean:
+        centroids[j] = acc / N;
     }
 
 }
