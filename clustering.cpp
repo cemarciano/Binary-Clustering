@@ -6,7 +6,7 @@
 
 #define N 6000000			// Size of data
 #define K 20				// Dimension of data
-#define CORES 19 			// Number of CPUs
+#define CORES 4 			// Number of CPUs
 
 using namespace std;
 
@@ -16,22 +16,22 @@ typedef double data_t;
 // Function declarations:
 data_t** generateRandomMatrix();
 void fillLines(int threadId, data_t** matrix);
+void binaryClustering(data_t** matrix);
+void sumForCentroids(int threadId, data_t* centroids, data_t** matrix);
 
 
 // Main program:
 int main(){
 
-	// Starts the stopwatch:
-	struct timespec start, finish;
-    clock_gettime(CLOCK_MONOTONIC, &start);
-
 	// Loads the data matrix:
 	data_t** data = generateRandomMatrix();
 
-	cout << "(debug) Line 61:" << endl;
-	for (int i = 0; i < K; i++){
-		cout << data[61][i] << "|";
-	}
+    // Starts the stopwatch:
+	struct timespec start, finish;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    cout << "Start!" << endl;
+    // Runs binary clustering algorithm:
+    binaryClustering(data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -47,12 +47,12 @@ int main(){
 // Generates *n* elements, each containing *k* attributes:
 data_t** generateRandomMatrix(){
 
-	// Allocates *n* rows for the data matrix:
-	data_t** matrix = new data_t*[N];
+	// Allocates *k* columns for the data matrix:
+	data_t** matrix = new data_t*[K];
 
-	// Allocates *k* columns:
-	for (int i = 0; i < N; i++){
-		matrix[i] = new data_t[K];
+	// Allocates *n* rows:
+	for (int i = 0; i < K; i++){
+		matrix[i] = new data_t[N];
 	}
 
 
@@ -75,6 +75,7 @@ data_t** generateRandomMatrix(){
 
 }
 
+// Dependency function executed by threads to fill a random data matrix:
 void fillLines(int threadId, data_t** matrix){
 
     // Randomizes interval of data for each thread:
@@ -84,16 +85,62 @@ void fillLines(int threadId, data_t** matrix){
     int gen = (15245 + 12345) % interval;
 
 	// Number of columns to fill:
-	int each = N / CORES;
+	int each = K / CORES;
 
-	// Loops through designated lines:
-	for (int i = threadId*each; i < threadId*each + each; i++){
-		// Loops through columns:
-		for (int j = 0; j < K; j++){
+	// Loops through designated columns:
+	for (int j = threadId*each; j < threadId*each + each; j++){
+		// Loops through lines:
+		for (int i = 0; i < N; i++){
 			// Fills in random data:
             gen = (1664521*gen + 12341) % interval;
-			matrix[i][j] = gen;//(rand() % interval) - (interval / 2);
+			matrix[j][i] = gen;
 		}
 	}
+
+}
+
+void binaryClustering(data_t** matrix){
+
+    /****************************/
+    /*** CENTROID CALCULATION ***/
+    /****************************/
+
+    // Allocates centroid array:
+    data_t* centroids = new data_t[K]();
+
+    // Array of threads:
+	std::thread centroidTasks[CORES];
+
+	// Loops through threads:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		// Fires up thread to fill matrix:
+		centroidTasks[threadId] = thread(sumForCentroids, threadId, centroids, matrix);
+	}
+
+	// Waits until all threads are done:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		centroidTasks[threadId].join();
+	}
+
+    // Divides the sums by K to find centroid values:
+    for (int i = 0; i < K; i++){
+        centroids[i] /= N;
+        cout << centroids[i] << " - ";
+    }
+
+}
+
+void sumForCentroids(int threadId, data_t* centroids, data_t** matrix){
+
+    // Number of columns to sum:
+	int each = K / CORES;
+
+    // Loops through designated columns:
+	for (int j = threadId*each; j < threadId*each + each; j++){
+        // Loops through lines:
+		for (int i = 0; i < N; i++){
+            centroids[j] += matrix[j][i];
+        }
+    }
 
 }
