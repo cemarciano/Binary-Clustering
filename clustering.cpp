@@ -6,7 +6,7 @@
 
 #define N 6000000			// Size of data
 #define K 20				// Dimension of data
-#define CORES 4 			// Number of CPUs
+#define CORES 19 			// Number of CPUs
 
 using namespace std;
 
