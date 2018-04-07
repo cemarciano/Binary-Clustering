@@ -153,7 +153,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
         for (int j = 0; j < K; j++){
             // Checks where data is positioned in regards to centroid:
             if (matrix[j][i] > centroids[j]){
-                // Moves the memory position further:
+                // Moves the memory position further (sets 1 in bitmask, represented in 10s):
                 memAcc += powArr[j];
             }
         }
@@ -181,7 +181,7 @@ data_t** generateRandomMatrix(bool parallel){
 
     if (parallel){
     	// Array of threads:
-    	std::thread tasks[CORES];
+    	thread tasks[CORES];
 
     	// Loops through threads:
     	for (int threadId = 0; threadId < CORES; threadId++){
