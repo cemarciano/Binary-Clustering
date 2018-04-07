@@ -9,8 +9,6 @@ using namespace std;
 Bitmask::Bitmask(int length, bool setTrue){
     // Saves total length of bitmask:
     bitmaskLength = length;
-    // Signals that bitmask is empty:
-    vCount = 0;
     // Allocates memory space:
     vArray = new bitset<B_SIZE>[(int)ceil(bitmaskLength/B_SIZE)+B_SIZE];
     // Fills in all elements with starting value:
@@ -35,14 +33,6 @@ void Bitmask::put(int i, bool value){
         cout << "ERRO: Acesso a indice indefinido no Bitmask." << endl;
         return;
     }
-    // Reflects total count of bitmask elements:
-    if (value != this->get(i)){
-        if (value == true){
-            vCount++;
-        } else {
-            vCount--;
-        }
-    }
     // Puts value in the i-th position:
     int byteNum = floor((float)(i-1.0)/B_SIZE);
     int bitNum = (i-1) % B_SIZE;
@@ -51,33 +41,20 @@ void Bitmask::put(int i, bool value){
 }
 
 
-// Returns true if all elements in bitmask are FALSE:
-bool Bitmask::isEmpty(){
-    // If number of true elements is bigger than zero:
-    if (vCount > 0){
-        return false;
-    // If number of true elements is zero:
-    } else {
-        return true;
-    }
-}
 
-// Returns true if all elements in bitmask are TRUE:
-bool Bitmask::isFull(){
-    // If number of true elements is equal to total length:
-    if (vCount == bitmaskLength){
-        return true;
-    // Case where at least one element is false:
-    } else {
-        return false;
-    }
-}
-
-
-// Returns number of TRUE elements:
+// Returns the number of TRUE elements in O(n):
 int Bitmask::getSize(){
-    return vCount;
+    // Accumulator variable:
+    int acc = 0;
+    // Loops through the bitmask:
+    for (int i=1; i<=bitmaskLength; i++){
+        acc += (int) this->get(i);
+    }
+    // Returns sum of true elements:
+    return acc;
 }
+
+
 
 // Returns total allocated length:
 int Bitmask::getLength(){

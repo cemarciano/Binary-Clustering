@@ -15,13 +15,7 @@ class Bitmask {
 		// Puts value in the i-th position:
         void put(int i, bool value);
 
-		// Returns true if all elements in bitmask are FALSE:
-        bool isEmpty();
-
-		// Returns true if all elements in bitmask are TRUE:
-        bool isFull();
-
-		// Returns number of TRUE elements:
+        // Returns the number of TRUE elements in O(n):
         int getSize();
 
 		// Returns total allocated length:
@@ -44,7 +38,6 @@ class Bitmask {
     protected:
     private:
         std::bitset<8>* vArray;
-        int vCount;
         int bitmaskLength;
 };
 

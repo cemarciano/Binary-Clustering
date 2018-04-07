@@ -5,17 +5,19 @@
 #include "Bitmask.h"		// Array class for storing bits
 
 #define N 6000000			// Size of data
-#define K 21				// Dimension of data
-#define CORES 1 			// Number of CPUs
+#define K 20				// Dimension of data
+#define CORES 4 			// Number of CPUs
 
 using namespace std;
 
 typedef double data_t;
 
+int similar = 0;
 
 // Function declarations:
-data_t** generateRandomMatrix();
-void fillLines(int threadId, data_t** matrix);
+data_t** generateRandomMatrix(bool parallel);
+void fillLinesParallel(int threadId, data_t** matrix);
+void fillLinesSerial(data_t** matrix);
 void binaryClustering(data_t** matrix);
 void findCentroids(int threadId, data_t* centroids, data_t** matrix);
 void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix);
@@ -25,7 +27,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
 int main(){
 
 	// Loads the data matrix:
-	data_t** data = generateRandomMatrix();
+	data_t** data = generateRandomMatrix(false);
 
     // Starts the stopwatch:
 	struct timespec start, finish;
@@ -35,7 +37,7 @@ int main(){
     binaryClustering(data);
 
 	// Stops the stopwatch:
-	clock_gettime(CLOCK_MONOTONIC, &finish);
+	//clock_gettime(CLOCK_MONOTONIC, &finish);
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -46,61 +48,6 @@ int main(){
 }
 
 
-// Generates *n* elements, each containing *k* attributes:
-data_t** generateRandomMatrix(){
-
-	// Allocates *k* columns for the data matrix:
-	data_t** matrix = new data_t*[K];
-
-	// Allocates *n* rows:
-	for (int i = 0; i < K; i++){
-		matrix[i] = new data_t[N];
-	}
-
-
-	// Array of threads:
-	std::thread tasks[CORES];
-
-	// Loops through threads:
-	for (int threadId = 0; threadId < CORES; threadId++){
-		// Fires up thread to fill matrix:
-		tasks[threadId] = thread(fillLines, threadId, matrix);
-	}
-
-	// Waits until all threads are done:
-	for (int threadId = 0; threadId < CORES; threadId++){
-		tasks[threadId].join();
-	}
-
-	// Returns filled structure:
-	return matrix;
-
-}
-
-// Dependency function executed by threads to fill a random data matrix:
-void fillLines(int threadId, data_t** matrix){
-
-    // Randomizes interval of data for each thread:
-    int interval = (threadId+1)*263 % 200;
-
-	// Number of columns to fill:
-	int each = K / CORES;
-
-	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
-	mt19937 random_number_engine; // pseudorandom number generator
-	auto dice_roller = bind(dice_distribution, random_number_engine);
-
-	// Loops through designated columns:
-	for (int j = threadId*each; j < threadId*each + each; j++){
-		// Loops through lines:
-		for (int i = 0; i < N; i++){
-			// Fills in random data:
-            //gen = (1664521*gen + 12341) % interval;
-			matrix[j][i] = dice_roller();
-		}
-	}
-
-}
 
 void binaryClustering(data_t** matrix){
 
@@ -152,17 +99,22 @@ void binaryClustering(data_t** matrix){
 		similarityTasks[threadId].join();
 	}
 
-    cout << endl << "Total items: " << bitmask.getSize() << endl;
+    cout << endl << "Selected items: " << bitmask.getSize() << endl;
+    cout << "Similar items: " << similar << endl;
 
 }
 
 void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 
     // Number of columns to sum:
-	int each = K / CORES;
+	float each = K*1.0 / CORES;
+
+    // Calculates chunck:
+    int start = round(threadId*each);
+    int end = round((threadId+1)*each);
 
     // Loops through designated columns:
-	for (int j = threadId*each; j < threadId*each + each; j++){
+	for (int j = start; j < end; j++){
         // Accumulator:
         data_t acc = 0;
         // Loops through lines:
@@ -179,10 +131,14 @@ void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix){
 
     // Number of lines to check:
-	int each = N / CORES;
+	float each = N*1.0 / CORES;
+
+    // Calculates chunck:
+    int start = round(threadId*each);
+    int end = round((threadId+1)*each);
 
     // Loops through designated lines:
-	for (int i = threadId*each; i < threadId*each + each; i++){
+	for (int i = start; i < end; i++){
         // Memory position accumulator:
         int memAcc = 1;
         // Loops through columns:
@@ -193,10 +149,93 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
                 memAcc += pow(2,j);
             }
         }
-        // Check if similar data has not yet been found:
+        // Checks if similar data has not yet been found:
         if (bitmask->get(memAcc) == false){
             // Marks data as found:
             bitmask->put(memAcc, true);
+        } else {
+            similar++;
         }
     }
+}
+
+
+// Generates *n* elements, each containing *k* attributes:
+data_t** generateRandomMatrix(bool parallel){
+
+	// Allocates *k* columns for the data matrix:
+	data_t** matrix = new data_t*[K];
+
+	// Allocates *n* rows:
+	for (int i = 0; i < K; i++){
+		matrix[i] = new data_t[N];
+	}
+
+    if (parallel){
+    	// Array of threads:
+    	std::thread tasks[CORES];
+
+    	// Loops through threads:
+    	for (int threadId = 0; threadId < CORES; threadId++){
+    		// Fires up thread to fill matrix:
+    		tasks[threadId] = thread(fillLinesParallel, threadId, matrix);
+    	}
+
+    	// Waits until all threads are done:
+    	for (int threadId = 0; threadId < CORES; threadId++){
+    		tasks[threadId].join();
+    	}
+    } else {
+        fillLinesSerial(matrix);
+    }
+
+	// Returns filled structure:
+	return matrix;
+
+}
+
+
+// Dependency function executed by threads to fill a random data matrix:
+void fillLinesParallel(int threadId, data_t** matrix){
+
+    // Randomizes interval of data for each thread:
+    int interval = (threadId+1)*2633 % 200;
+
+	// Number of columns to fill:
+	int each = K / CORES;
+
+	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
+	mt19937 random_number_engine; // pseudorandom number generator
+	auto dice_roller = bind(dice_distribution, random_number_engine);
+
+	// Loops through designated columns:
+	for (int j = threadId*each; j < threadId*each + each; j++){
+		// Loops through lines:
+		for (int i = 0; i < N; i++){
+			// Fills in random data:
+            //gen = (1664521*gen + 12341) % interval;
+			matrix[j][i] = dice_roller();
+		}
+	}
+
+}
+
+// Dependency function executed by threads to fill a random data matrix:
+void fillLinesSerial(data_t** matrix){
+
+    // Interval of data:
+    int interval = 500;
+
+    // Seed:
+    srand(time(NULL));
+
+	// Loops through columns:
+	for (int j = 0; j < K; j++){
+		// Loops through lines:
+		for (int i = 0; i < N; i++){
+			// Fills in random data:
+			matrix[j][i] = rand() % interval;
+		}
+	}
+
 }
