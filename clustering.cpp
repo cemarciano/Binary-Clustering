@@ -37,7 +37,7 @@ int main(){
     binaryClustering(data);
 
 	// Stops the stopwatch:
-	//clock_gettime(CLOCK_MONOTONIC, &finish);
+	clock_gettime(CLOCK_MONOTONIC, &finish);
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -83,7 +83,6 @@ void binaryClustering(data_t** matrix){
 
     // Bitmask to hold unused similarity combinations:
     Bitmask bitmask(pow(2,K+1), false);
-    // To access an index: bitmask.put(i + 2*j + 4*k + 2^n*k)
 
     // Array of threads:
 	std::thread similarityTasks[CORES];
@@ -204,6 +203,7 @@ void fillLinesParallel(int threadId, data_t** matrix){
 	// Number of columns to fill:
 	int each = K / CORES;
 
+    // RNG init:
 	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
 	mt19937 random_number_engine; // pseudorandom number generator
 	auto dice_roller = bind(dice_distribution, random_number_engine);
@@ -213,7 +213,6 @@ void fillLinesParallel(int threadId, data_t** matrix){
 		// Loops through lines:
 		for (int i = 0; i < N; i++){
 			// Fills in random data:
-            //gen = (1664521*gen + 12341) % interval;
 			matrix[j][i] = dice_roller();
 		}
 	}
