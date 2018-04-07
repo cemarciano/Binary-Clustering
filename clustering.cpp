@@ -13,6 +13,7 @@ using namespace std;
 typedef double data_t;
 
 int similar = 0;
+int* powArr;
 
 // Function declarations:
 data_t** generateRandomMatrix(bool parallel);
@@ -84,6 +85,14 @@ void binaryClustering(data_t** matrix){
     // Bitmask to hold unused similarity combinations:
     Bitmask bitmask(pow(2,K+1), false);
 
+    // Array containing future indexes of bitmask:
+    powArr = new int[K];
+    // Fills the array:
+    for (int i = 0; i < K; i++){
+        powArr[i] = pow(2,i);
+    }
+
+
     // Array of threads:
 	std::thread similarityTasks[CORES];
 
@@ -145,7 +154,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
             // Checks where data is positioned in regards to centroid:
             if (matrix[j][i] > centroids[j]){
                 // Moves the memory position further:
-                memAcc += pow(2,j);
+                memAcc += powArr[j];
             }
         }
         // Checks if similar data has not yet been found:
