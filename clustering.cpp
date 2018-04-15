@@ -5,7 +5,7 @@
 #include "Bitmask.h"		// Array class for storing bits
 
 #define N 6000000			// Size of data
-#define K 20				// Dimension of data
+#define K 23				// Dimension of data
 #define CORES 4 			// Number of CPUs
 
 using namespace std;
@@ -34,6 +34,7 @@ int main(){
 	struct timespec start, finish;
     clock_gettime(CLOCK_MONOTONIC, &start);
     cout << "Start!" << endl;
+    
     // Runs binary clustering algorithm:
     binaryClustering(data);
 
