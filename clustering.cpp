@@ -1,12 +1,7 @@
-typedef double data_t;
-
-#define N 6000000			// Size of data
-#define K 20				// Dimension of data
-#define CORES 4 			// Number of CPUs
-
+#include "global.h"         // Global settings
 #include <iostream>			// Formatted output
-#include <random>			// For random data generation
 #include <ctime>			// For stopwatch
+#include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
@@ -18,16 +13,17 @@ int similar = 0;
 int* powArr;
 
 // Function declarations:
-void binaryClustering(Matrix matrix);
-void findCentroids(int threadId, data_t* centroids, data_t** matrix);
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix);
+void binaryClustering(Matrix* matrix);
+void findCentroids(int threadId, data_t* centroids, Matrix* matrix);
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix);
 
 
 // Main program:
 int main(){
 
 	// Loads the data matrix:
-	Matrix data = Matrix(N, K);
+	Matrix data(N, K);
+
 	// Generates random data for matrix:
 	data.generateRandom(false);
 
@@ -37,7 +33,7 @@ int main(){
     cout << "Start!" << endl;
 
     // Runs binary clustering algorithm:
-    binaryClustering(data);
+    binaryClustering(&data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -52,7 +48,7 @@ int main(){
 
 
 
-void binaryClustering(Matrix matrix){
+void binaryClustering(Matrix* matrix){
 
     /****************************/
     /*** CENTROID CALCULATION ***/
@@ -62,7 +58,7 @@ void binaryClustering(Matrix matrix){
     data_t* centroids = new data_t[K]();
 
     // Array of threads:
-	std::thread centroidTasks[CORES];
+	thread centroidTasks[CORES];
 
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
@@ -114,7 +110,7 @@ void binaryClustering(Matrix matrix){
 
 }
 
-void findCentroids(int threadId, data_t* centroids, data_t** matrix){
+void findCentroids(int threadId, data_t* centroids, Matrix* matrix){
 
     // Number of columns to sum:
 	float each = K*1.0 / CORES;
@@ -129,7 +125,7 @@ void findCentroids(int threadId, data_t* centroids, data_t** matrix){
         data_t acc = 0;
         // Loops through lines:
 		for (int i = 0; i < N; i++){
-            acc += matrix[j][i];
+            acc += matrix->get(i, j);
         }
         // Writes accumulator mean:
         centroids[j] = acc / N;
@@ -138,7 +134,7 @@ void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 }
 
 
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix){
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix){
 
     // Number of lines to check:
 	float each = N*1.0 / CORES;
@@ -154,7 +150,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
         // Loops through columns:
         for (int j = 0; j < K; j++){
             // Checks where data is positioned in regards to centroid:
-            if (matrix[j][i] > centroids[j]){
+            if (matrix->get(i, j) > centroids[j]){
                 // Moves the memory position further (sets 1 in bitmask, represented in 10s):
                 memAcc += powArr[j];
             }

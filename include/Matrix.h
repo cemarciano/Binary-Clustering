@@ -1,20 +1,27 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include "global.h"
+
+typedef double data_t;
+
 class Matrix {
     public:
 		// Constructor:
         Matrix(int dimRows, int dimColumns);
 
 		// Generates *n* elements, each containing *k* attributes:
-		generateRandom(bool parallel);
+		void generateRandom(bool parallel);
+
+        // Retrieves a value:
+        data_t get(int i, int j);
+
+        // Saves a value:
+        data_t put(data_t value, int i, int j);
 
 		// Destructor:
         ~Matrix();
 
-		// Operator overload to implement matrix functionality:
-		data_t* operator [](int i) const {return matrix[i];}
-    	data_t* & operator [](int i) {return matrix[i];}
 
     protected:
 
@@ -25,9 +32,9 @@ class Matrix {
         void fillLinesParallel(int threadId);
 
     private:
-        data_t matrix
-        int i;
-		int j;
+        data_t** matrix;
+        int rows;
+		int columns;
 };
 
 #endif // MATRIX_H

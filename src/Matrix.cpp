@@ -1,18 +1,38 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>            // Math routines
+#include <thread>			// To parallelize computation
+#include <random>			// For random data generation
+#include "Matrix.h"
+
+using namespace std;
 
 // Allocates space for matrix:
-void Matrix::Matrix(int dimRows, int dimColumns){
+Matrix::Matrix(int dimRows, int dimColumns){
 
 	// Saves dimensions:
 	rows = dimRows;
 	columns = dimColumns;
 
 	// Allocates *k* columns for the data matrix:
-	data_t** matrix = new data_t*[columns];
+	matrix = new data_t*[columns];
 
 	// Allocates *n* rows:
 	for (int j = 0; j < columns; j++){
 		matrix[j] = new data_t[rows];
 	}
+}
+
+
+// Returns a value:
+data_t Matrix::get(int i, int j){
+    return matrix[j][i];
+}
+
+
+// Saves a value:
+data_t Matrix::put(data_t value, int i, int j){
+    matrix[j][i] = value;
 }
 
 
@@ -27,7 +47,7 @@ void Matrix::generateRandom(bool parallel){
     	// Loops through threads:
     	for (int threadId = 0; threadId < CORES; threadId++){
     		// Fires up thread to fill matrix:
-    		tasks[threadId] = thread(fillLinesParallel, threadId, matrix);
+    		tasks[threadId] = thread(&Matrix::fillLinesParallel, this, threadId);
     	}
 
     	// Waits until all threads are done:
@@ -35,7 +55,7 @@ void Matrix::generateRandom(bool parallel){
     		tasks[threadId].join();
     	}
     } else {
-        fillLinesSerial(matrix);
+        this->fillLinesSerial();
     }
 
 }
@@ -48,7 +68,7 @@ void Matrix::fillLinesParallel(int threadId){
     int interval = (threadId+1)*2633 % 200;
 
 	// Number of columns to fill:
-	int each = K / CORES;
+	int each = columns / CORES;
 
     // RNG init:
 	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
@@ -60,7 +80,7 @@ void Matrix::fillLinesParallel(int threadId){
 		// Loops through lines:
 		for (int i = 0; i < rows; i++){
 			// Fills in random data:
-			matrix[j][i] = dice_roller();
+			this->put(dice_roller(), i, j);
 		}
 	}
 
@@ -80,19 +100,19 @@ void Matrix::fillLinesSerial(){
 		// Loops through rows:
 		for (int i = 0; i < rows; i++){
 			// Fills in random data:
-			matrix[j][i] = rand() % interval;
+			this->put(rand() % interval, i, j);
 		}
 	}
 
 }
 
-void Matrix::~Matrix(){
+Matrix::~Matrix(){
 
 	// Deletes every columns:
 	for (int j = 0; j < columns; j++){
 		delete[] matrix[j];
 	}
 
-	// Deletes main array:
-	delete[] matrix;
+    delete[] matrix;
+
 }
