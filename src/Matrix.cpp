@@ -8,31 +8,55 @@
 using namespace std;
 
 // Allocates space for matrix:
-Matrix::Matrix(int dimRows, int dimColumns){
+Matrix::Matrix(int dimRows, int dimColumns, bool columnsSeq){
+
 
 	// Saves dimensions:
 	rows = dimRows;
 	columns = dimColumns;
 
-	// Allocates *k* columns for the data matrix:
-	matrix = new data_t*[columns];
+	// Saves matrix layout:
+	inverted = columnsSeq;
 
-	// Allocates *n* rows:
-	for (int j = 0; j < columns; j++){
-		matrix[j] = new data_t[rows];
+	if (inverted){
+
+		// Allocates *k* columns for the data matrix:
+		matrix = new data_t*[columns];
+
+		// Allocates *n* rows:
+		for (int j = 0; j < columns; j++){
+			matrix[j] = new data_t[rows];
+		}
+
+	} else {
+
+		// Allocates *n* rows for the data matrix:
+		matrix = new data_t*[rows];
+
+		// Allocates *k* columns:
+		for (int j = 0; j < rows; j++){
+			matrix[j] = new data_t[columns];
 	}
 }
 
 
 // Returns a value:
 data_t Matrix::get(int i, int j){
-    return matrix[j][i];
+	if (inverted){
+    	return matrix[j][i];
+	} else {
+		return matrix[i][j];
+	}
 }
 
 
 // Saves a value:
 data_t Matrix::put(data_t value, int i, int j){
-    matrix[j][i] = value;
+	if (inverted){
+    	matrix[j][i] = value;
+	} else {
+		matrix[i][j] = value;
+	}
 }
 
 

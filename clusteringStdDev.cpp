@@ -1,41 +1,39 @@
+#include "global.h"         // Global settings
 #include <iostream>			// Formatted output
-#include <random>			// For random data generation
 #include <ctime>			// For stopwatch
+#include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
 #include "Bitmask.h"		// Array class for storing bits
-
-#define N 6000000			// Size of data
-#define K 20				// Dimension of data
-#define CORES 4 			// Number of CPUs
+#include "Matrix.h"			// Data matrix class
 
 using namespace std;
 
-typedef double data_t;
 
 int similar = 0;
 int* powArr;
 
 // Function declarations:
-data_t** generateRandomMatrix(bool parallel);
-void fillLinesParallel(int threadId, data_t** matrix);
-void fillLinesSerial(data_t** matrix);
-void binaryClustering(data_t** matrix);
-void findCentroids(int threadId, data_t* centroids, data_t** matrix);
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix);
+void binaryClustering(Matrix* matrix);
+void findCentroids(int threadId, data_t* centroids, Matrix* matrix);
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix);
 
 
 // Main program:
 int main(){
 
 	// Loads the data matrix:
-	data_t** data = generateRandomMatrix(false);
+	Matrix data(N, D, true);
+
+	// Generates random data for matrix:
+	data.generateRandom(false);
 
     // Starts the stopwatch:
 	struct timespec start, finish;
     clock_gettime(CLOCK_MONOTONIC, &start);
     cout << "Start!" << endl;
+
     // Runs binary clustering algorithm:
-    binaryClustering(data);
+    binaryClustering(&data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -50,17 +48,19 @@ int main(){
 
 
 
-void binaryClustering(data_t** matrix){
+void binaryClustering(Matrix* matrix){
 
     /****************************/
     /*** CENTROID CALCULATION ***/
     /****************************/
 
     // Allocates centroid array:
-    data_t* centroids = new data_t[K]();
+    data_t* centroids = new data_t[D]();
+	// Allocates stddev array:
+    data_t* stdDev = new data_t[D]();
 
     // Array of threads:
-	std::thread centroidTasks[CORES];
+	thread centroidTasks[CORES];
 
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
@@ -74,22 +74,59 @@ void binaryClustering(data_t** matrix){
 	}
 
     // Prints centroid values:
-    for (int i = 0; i < K; i++){
+    for (int i = 0; i < D; i++){
         cout << centroids[i] << " - ";
     }
+	cout << endl;
+	// Prints stddev values:
+    for (int i = 0; i < D; i++){
+        cout << stdDev[i] << " - ";
+    }
+
+	/***************************/
+    /*** DIVISION BOUNDARIES ***/
+    /***************************/
+
+	// Creates matrix D-DIMENSIONS by K-DIVISIONS:
+	Matrix boundaries(D, K);
+
+	// Step to divide boundaries with:
+	float step;
+	// Checks how to divide the space:
+	if (K % 2 == 0){
+		// Calculates initial step:
+		float step = -1*floor((K - 1)/2);
+	} else {
+		// Calculates initial step:
+		float step = -1*floor((K - 2)/2);
+	}
+	// Runs through dimensions of matrix:
+	for (int i = 0; i < D; i++){
+		// Runs through each division:
+		for (int j = 0; j < K; j++){
+			// Saves the value of the boundary:
+			boundaries.put(i, j, (step+j)*stdDev[i]);
+		}
+	}
+
+	cout << endl;
+	// Prints boundaries:
+	for (int j = 0; j < K; j++){
+		cout << boundaries->get(0, j) << " - ";
+	}
 
     /************************/
     /*** SIMILARITY CHECK ***/
     /************************/
 
-    // Bitmask to hold unused similarity combinations:
-    Bitmask bitmask(pow(2,K+1), false);
+    // Bitmask to hold unused similarity combinations (number of divisions ^ total dimensions):
+    Bitmask bitmask(pow(K,D+1), false);
 
     // Array containing future indexes of bitmask:
-    powArr = new int[K];
-    // Fills the array:
-    for (int i = 0; i < K; i++){
-        powArr[i] = pow(2,i);
+    powArr = new int[D];
+    // Fills the array with powers of the number of divisions:
+    for (int i = 0; i < D; i++){
+        powArr[i] = pow(K,i);
     }
 
 
@@ -112,10 +149,10 @@ void binaryClustering(data_t** matrix){
 
 }
 
-void findCentroids(int threadId, data_t* centroids, data_t** matrix){
+void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = K*1.0 / CORES;
+	float each = D*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -123,20 +160,38 @@ void findCentroids(int threadId, data_t* centroids, data_t** matrix){
 
     // Loops through designated columns:
 	for (int j = start; j < end; j++){
+
+		// CENTROID:
+
         // Accumulator:
         data_t acc = 0;
         // Loops through lines:
 		for (int i = 0; i < N; i++){
-            acc += matrix[j][i];
+            acc += matrix->get(i, j);
         }
         // Writes accumulator mean:
         centroids[j] = acc / N;
+
+		// STDDEV:
+
+		// Accumulator:
+        acc = 0;
+		// Current centroid:
+		data_t currCentroid = centroids[j];
+        // Loops through lines:
+		for (int i = 0; i < N; i++){
+            acc += pow( matrix->get(i, j) - currCentroid, 2);
+        }
+        // Writes accumulator stddev:
+        stdDev[j] = sqrt(acc/N);
     }
 
 }
 
 
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** matrix){
+
+
+void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix){
 
     // Number of lines to check:
 	float each = N*1.0 / CORES;
@@ -150,9 +205,9 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
         // Memory position accumulator:
         int memAcc = 1;
         // Loops through columns:
-        for (int j = 0; j < K; j++){
+        for (int j = 0; j < D; j++){
             // Checks where data is positioned in regards to centroid:
-            if (matrix[j][i] > centroids[j]){
+            if (matrix->get(i, j) > centroids[j]){
                 // Moves the memory position further (sets 1 in bitmask, represented in 10s):
                 memAcc += powArr[j];
             }
@@ -165,85 +220,4 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, data_t** m
             similar++;
         }
     }
-}
-
-
-// Generates *n* elements, each containing *k* attributes:
-data_t** generateRandomMatrix(bool parallel){
-
-	// Allocates *k* columns for the data matrix:
-	data_t** matrix = new data_t*[K];
-
-	// Allocates *n* rows:
-	for (int i = 0; i < K; i++){
-		matrix[i] = new data_t[N];
-	}
-
-    if (parallel){
-    	// Array of threads:
-    	thread tasks[CORES];
-
-    	// Loops through threads:
-    	for (int threadId = 0; threadId < CORES; threadId++){
-    		// Fires up thread to fill matrix:
-    		tasks[threadId] = thread(fillLinesParallel, threadId, matrix);
-    	}
-
-    	// Waits until all threads are done:
-    	for (int threadId = 0; threadId < CORES; threadId++){
-    		tasks[threadId].join();
-    	}
-    } else {
-        fillLinesSerial(matrix);
-    }
-
-	// Returns filled structure:
-	return matrix;
-
-}
-
-
-// Dependency function executed by threads to fill a random data matrix:
-void fillLinesParallel(int threadId, data_t** matrix){
-
-    // Randomizes interval of data for each thread:
-    int interval = (threadId+1)*2633 % 200;
-
-	// Number of columns to fill:
-	int each = K / CORES;
-
-    // RNG init:
-	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
-	mt19937 random_number_engine; // pseudorandom number generator
-	auto dice_roller = bind(dice_distribution, random_number_engine);
-
-	// Loops through designated columns:
-	for (int j = threadId*each; j < threadId*each + each; j++){
-		// Loops through lines:
-		for (int i = 0; i < N; i++){
-			// Fills in random data:
-			matrix[j][i] = dice_roller();
-		}
-	}
-
-}
-
-// Dependency function executed by threads to fill a random data matrix:
-void fillLinesSerial(data_t** matrix){
-
-    // Interval of data:
-    int interval = 500;
-
-    // Seed:
-    srand(time(NULL));
-
-	// Loops through columns:
-	for (int j = 0; j < K; j++){
-		// Loops through lines:
-		for (int i = 0; i < N; i++){
-			// Fills in random data:
-			matrix[j][i] = rand() % interval;
-		}
-	}
-
 }

@@ -22,7 +22,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* ma
 int main(){
 
 	// Loads the data matrix:
-	Matrix data(N, K);
+	Matrix data(N, D, true);
 
 	// Generates random data for matrix:
 	data.generateRandom(false);
@@ -55,7 +55,7 @@ void binaryClustering(Matrix* matrix){
     /****************************/
 
     // Allocates centroid array:
-    data_t* centroids = new data_t[K]();
+    data_t* centroids = new data_t[D]();
 
     // Array of threads:
 	thread centroidTasks[CORES];
@@ -72,7 +72,7 @@ void binaryClustering(Matrix* matrix){
 	}
 
     // Prints centroid values:
-    for (int i = 0; i < K; i++){
+    for (int i = 0; i < D; i++){
         cout << centroids[i] << " - ";
     }
 
@@ -81,12 +81,12 @@ void binaryClustering(Matrix* matrix){
     /************************/
 
     // Bitmask to hold unused similarity combinations:
-    Bitmask bitmask(pow(2,K+1), false);
+    Bitmask bitmask(pow(2,D+1), false);
 
     // Array containing future indexes of bitmask:
-    powArr = new int[K];
+    powArr = new int[D];
     // Fills the array:
-    for (int i = 0; i < K; i++){
+    for (int i = 0; i < D; i++){
         powArr[i] = pow(2,i);
     }
 
@@ -113,7 +113,7 @@ void binaryClustering(Matrix* matrix){
 void findCentroids(int threadId, data_t* centroids, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = K*1.0 / CORES;
+	float each = D*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -148,7 +148,7 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* ma
         // Memory position accumulator:
         int memAcc = 1;
         // Loops through columns:
-        for (int j = 0; j < K; j++){
+        for (int j = 0; j < D; j++){
             // Checks where data is positioned in regards to centroid:
             if (matrix->get(i, j) > centroids[j]){
                 // Moves the memory position further (sets 1 in bitmask, represented in 10s):

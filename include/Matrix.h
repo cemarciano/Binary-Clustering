@@ -8,7 +8,7 @@ typedef double data_t;
 class Matrix {
     public:
 		// Constructor:
-        Matrix(int dimRows, int dimColumns);
+        Matrix(int dimRows, int dimColumns, bool columnsSeq=false);
 
 		// Generates *n* elements, each containing *k* attributes:
 		void generateRandom(bool parallel);
@@ -35,6 +35,7 @@ class Matrix {
         data_t** matrix;
         int rows;
 		int columns;
+		bool inverted;
 };
 
 #endif // MATRIX_H
