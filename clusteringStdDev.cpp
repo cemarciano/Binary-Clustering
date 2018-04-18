@@ -14,7 +14,7 @@ int* powArr;
 
 // Function declarations:
 void binaryClustering(Matrix* matrix);
-void findCentroids(int threadId, data_t* centroids, Matrix* matrix);
+void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix);
 
 
@@ -65,7 +65,7 @@ void binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		centroidTasks[threadId] = thread(findCentroids, threadId, centroids, matrix);
+		centroidTasks[threadId] = thread(findCentroids, threadId, centroids, stdDev, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -88,32 +88,32 @@ void binaryClustering(Matrix* matrix){
     /***************************/
 
 	// Creates matrix D-DIMENSIONS by K-DIVISIONS:
-	Matrix boundaries(D, K);
+	Matrix boundaries(D, K-1);
 
 	// Step to divide boundaries with:
 	float step;
 	// Checks how to divide the space:
 	if (K % 2 == 0){
 		// Calculates initial step:
-		float step = -1*floor((K - 1)/2);
+		step = -1*floor((K - 1)/2);
+        cout << "Step: -" << step << "- ";
 	} else {
 		// Calculates initial step:
-		float step = -1*floor((K - 2)/2);
+		step = -1*(1.0*(K - 2)/2);
 	}
 	// Runs through dimensions of matrix:
 	for (int i = 0; i < D; i++){
 		// Runs through each division:
-		for (int j = 0; j < K; j++){
+		for (int j = 0; j < K-1; j++){
 			// Saves the value of the boundary:
 			boundaries.put(i, j, (step+j)*stdDev[i]);
+            cout << endl << "Putting " << (step+j)*stdDev[i];
 		}
 	}
 
 	cout << endl;
 	// Prints boundaries:
-	for (int j = 0; j < K; j++){
-		cout << boundaries->get(0, j) << " - ";
-	}
+	boundaries.print(D);
 
     /************************/
     /*** SIMILARITY CHECK ***/

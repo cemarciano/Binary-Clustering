@@ -17,7 +17,10 @@ class Matrix {
         data_t get(int i, int j);
 
         // Saves a value:
-        data_t put(data_t value, int i, int j);
+        data_t put(int i, int j, data_t value);
+
+        // Saves a value:
+        void print(int numRows);
 
 		// Destructor:
         ~Matrix();
