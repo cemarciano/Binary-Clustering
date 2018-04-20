@@ -48,7 +48,9 @@ int Bitmask::getSize(){
     int acc = 0;
     // Loops through the bitmask:
     for (int i=1; i<=bitmaskLength; i++){
-        acc += (int) this->get(i);
+        if (this->get(i) == true){
+            acc += 1;
+        }
     }
     // Returns sum of true elements:
     return acc;
