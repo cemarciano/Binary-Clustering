@@ -36,6 +36,7 @@ Matrix::Matrix(int dimRows, int dimColumns, bool columnsSeq){
 		// Allocates *k* columns:
 		for (int j = 0; j < rows; j++){
 			matrix[j] = new data_t[columns];
+        }
 	}
 }
 
@@ -51,7 +52,7 @@ data_t Matrix::get(int i, int j){
 
 
 // Saves a value:
-data_t Matrix::put(data_t value, int i, int j){
+data_t Matrix::put(int i, int j, data_t value){
 	if (inverted){
     	matrix[j][i] = value;
 	} else {
@@ -104,7 +105,7 @@ void Matrix::fillLinesParallel(int threadId){
 		// Loops through lines:
 		for (int i = 0; i < rows; i++){
 			// Fills in random data:
-			this->put(dice_roller(), i, j);
+			this->put(i, j, dice_roller());
 		}
 	}
 
@@ -124,10 +125,28 @@ void Matrix::fillLinesSerial(){
 		// Loops through rows:
 		for (int i = 0; i < rows; i++){
 			// Fills in random data:
-			this->put(rand() % interval, i, j);
+			this->put(i, j, rand() % interval);
 		}
 	}
 
+}
+
+void Matrix::print(int numRows){
+    cout << endl;
+    // Loops through lines:
+    for (int i = 0; i < numRows; i++){
+        cout << "[";
+        // Loops through columns:
+        for (int j = 0; j < columns; j++){
+            // Prints data:
+            cout << this->get(i, j);
+            if (j != columns-1){
+                 cout << '\t';
+            }
+        }
+        cout << "]" << endl;
+    }
+    cout << endl;
 }
 
 Matrix::~Matrix(){

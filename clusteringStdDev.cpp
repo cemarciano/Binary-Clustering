@@ -3,19 +3,22 @@
 #include <ctime>			// For stopwatch
 #include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
+#include <limits>           // To use infinity
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
+#include <unistd.h>
 
 using namespace std;
 
 
 int similar = 0;
+int chosen = 0;
 int* powArr;
 
 // Function declarations:
 void binaryClustering(Matrix* matrix);
-void findCentroids(int threadId, data_t* centroids, Matrix* matrix);
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix);
+void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
+void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* matrix);
 
 
 // Main program:
@@ -65,7 +68,7 @@ void binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		centroidTasks[threadId] = thread(findCentroids, threadId, centroids, matrix);
+		centroidTasks[threadId] = thread(findCentroids, threadId, centroids, stdDev, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -95,25 +98,23 @@ void binaryClustering(Matrix* matrix){
 	// Checks how to divide the space:
 	if (K % 2 == 0){
 		// Calculates initial step:
-		float step = -1*floor((K - 1)/2);
+		step = -1*floor((K - 1)/2);
 	} else {
 		// Calculates initial step:
-		float step = -1*floor((K - 2)/2);
+		step = -1*(1.0*(K - 2)/2);
 	}
 	// Runs through dimensions of matrix:
 	for (int i = 0; i < D; i++){
 		// Runs through each division:
-		for (int j = 0; j < K; j++){
+		for (int j = 0; j < K-1; j++){
 			// Saves the value of the boundary:
-			boundaries.put(i, j, (step+j)*stdDev[i]);
+			boundaries.put(i, j, ((step+j)*stdDev[i])+centroids[i]);
 		}
+        // Adds infinity as last boundary:
+        boundaries.put(i, K-1, numeric_limits<data_t>::infinity());
 	}
 
-	cout << endl;
-	// Prints boundaries:
-	for (int j = 0; j < K; j++){
-		cout << boundaries->get(0, j) << " - ";
-	}
+
 
     /************************/
     /*** SIMILARITY CHECK ***/
@@ -136,7 +137,7 @@ void binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		similarityTasks[threadId] = thread(removeSimilar, threadId, centroids, &bitmask, matrix);
+		similarityTasks[threadId] = thread(removeSimilar, threadId, &boundaries, &bitmask, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -144,7 +145,8 @@ void binaryClustering(Matrix* matrix){
 		similarityTasks[threadId].join();
 	}
 
-    cout << endl << "Selected items: " << bitmask.getSize() << endl;
+    cout << endl << endl << "Selected items (count): " << chosen << endl;
+    cout << "Selected items (bitmask size): " << bitmask.getSize() << endl;
     cout << "Similar items: " << similar << endl;
 
 }
@@ -191,7 +193,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 
 
 
-void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* matrix){
+void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* matrix){
 
     // Number of lines to check:
 	float each = N*1.0 / CORES;
@@ -206,16 +208,24 @@ void removeSimilar(int threadId, data_t* centroids, Bitmask* bitmask, Matrix* ma
         int memAcc = 1;
         // Loops through columns:
         for (int j = 0; j < D; j++){
-            // Checks where data is positioned in regards to centroid:
-            if (matrix->get(i, j) > centroids[j]){
-                // Moves the memory position further (sets 1 in bitmask, represented in 10s):
-                memAcc += powArr[j];
+            // Loops through boundaries:
+            for (int k = 0; k < K; k++){
+                //if (threadId == 0) cout << "Got " << matrix->get(i, j) << " and comparing to boundary " << boundaries->get(j,k) << endl;
+                // Checks if data is to the left of boundary:
+                if (matrix->get(i, j) < boundaries->get(j,k)){
+                    //if (threadId == 0) cout << "Comparison was successfull, adding "<< powArr[j] + k - 1 << endl;
+                    // Moves the memory position further (sets 1 in bitmask, represented in 10s):
+                    memAcc += powArr[j]*k;
+                    break;
+                }
             }
         }
+        //cout << "memAcc = " << memAcc << endl;
         // Checks if similar data has not yet been found:
         if (bitmask->get(memAcc) == false){
             // Marks data as found:
             bitmask->put(memAcc, true);
+            chosen++;
         } else {
             similar++;
         }
