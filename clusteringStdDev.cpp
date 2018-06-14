@@ -28,7 +28,7 @@ int main(){
 	Matrix data(N, D, true);
 
 	// Generates random data for matrix:
-	data.generateRandom(false);
+	data.readFromFile("/home/cadu/signal.txt");
 
     // Starts the stopwatch:
 	struct timespec start, finish;
@@ -108,7 +108,7 @@ void binaryClustering(Matrix* matrix){
 		// Runs through each division:
 		for (int j = 0; j < K-1; j++){
 			// Saves the value of the boundary:
-			boundaries.put(i, j, ((step+j)*stdDev[i])+centroids[i]);
+			boundaries.put(i, j, (WARP*(step+j)*stdDev[i])+centroids[i]);
 		}
         // Adds infinity as last boundary:
         boundaries.put(i, K-1, numeric_limits<data_t>::infinity());

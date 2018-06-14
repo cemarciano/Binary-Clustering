@@ -13,6 +13,9 @@ class Matrix {
 		// Generates *n* elements, each containing *k* attributes:
 		void generateRandom(bool parallel);
 
+        // Fills matrix elements with file data:
+        void readFromFile(const char* fileLocation);
+
         // Retrieves a value:
         data_t get(int i, int j);
 

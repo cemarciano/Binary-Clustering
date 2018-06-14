@@ -3,6 +3,7 @@
 #include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
 #include <random>			// For random data generation
+#include <sstream>
 #include "Matrix.h"
 
 using namespace std;
@@ -58,6 +59,38 @@ data_t Matrix::put(int i, int j, data_t value){
 	} else {
 		matrix[i][j] = value;
 	}
+}
+
+
+// Fills matrix elements with file data:
+void Matrix::readFromFile(const char* fileLocation){
+    ifstream myFile;
+    // Opens communication with input file:
+    myFile.open(fileLocation);
+    cout << endl << "Reading file " << fileLocation << "... Please stand by." << endl;
+    if (!myFile){
+        // If file was not found:
+        cout << "File " << fileLocation << " not found." << endl;
+        return;
+    }
+    // Loop to read the entire input file:
+	string s;
+    // Number of lines read:
+    int lineCounter = 0;
+    while (getline(myFile, s)) {
+        // Helper variable to hold value of elements:
+        float value;
+		if (s.empty() == false){
+            // Increases count of lines:
+            lineCounter++;
+			istringstream tmp(s);
+            // Loops through elements of line:
+            for (int j=0; j<D; j++){
+                tmp >> value;
+                put(lineCounter-1, j, value);
+            }
+		}
+    }
 }
 
 
