@@ -25,10 +25,7 @@ void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* m
 int main(){
 
 	// Loads the data matrix:
-	Matrix data(N, D, true);
-
-	// Generates random data for matrix:
-	data.readFromFile("/home/cadu/signal.txt");
+	Matrix data("/home/cadu/signal.txt", true);
 
     // Starts the stopwatch:
 	struct timespec start, finish;

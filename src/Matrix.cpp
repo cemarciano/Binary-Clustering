@@ -9,62 +9,10 @@
 using namespace std;
 
 // Allocates space for matrix:
-Matrix::Matrix(int dimRows, int dimColumns, bool columnsSeq){
+Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 
-
-	// Saves dimensions:
-	rows = dimRows;
-	columns = dimColumns;
-
-	// Saves matrix layout:
-	inverted = columnsSeq;
-
-	if (inverted){
-
-		// Allocates *k* columns for the data matrix:
-		matrix = new data_t*[columns];
-
-		// Allocates *n* rows:
-		for (int j = 0; j < columns; j++){
-			matrix[j] = new data_t[rows];
-		}
-
-	} else {
-
-		// Allocates *n* rows for the data matrix:
-		matrix = new data_t*[rows];
-
-		// Allocates *k* columns:
-		for (int j = 0; j < rows; j++){
-			matrix[j] = new data_t[columns];
-        }
-	}
-}
-
-
-// Returns a value:
-data_t Matrix::get(int i, int j){
-	if (inverted){
-    	return matrix[j][i];
-	} else {
-		return matrix[i][j];
-	}
-}
-
-
-// Saves a value:
-data_t Matrix::put(int i, int j, data_t value){
-	if (inverted){
-    	matrix[j][i] = value;
-	} else {
-		matrix[i][j] = value;
-	}
-}
-
-
-// Fills matrix elements with file data:
-void Matrix::readFromFile(const char* fileLocation){
-    ifstream myFile;
+	// File object:
+	ifstream myFile;
     // Opens communication with input file:
     myFile.open(fileLocation);
     cout << endl << "Reading file " << fileLocation << "... Please stand by." << endl;
@@ -73,122 +21,159 @@ void Matrix::readFromFile(const char* fileLocation){
         cout << "File " << fileLocation << " not found." << endl;
         return;
     }
-    // Loop to read the entire input file:
+
+
+	////////////////////////////////////
+	/// RETRIEVES METADATA FROM FILE ///
+	////////////////////////////////////
+
 	string s;
+	// Retrieves signal size:
+	getline(myFile, s);
+	istringstream tmpSignal(s);
+	tmpSignal >> m_signalSize;
+	// Retrieves background size:
+	getline(myFile, s);
+	istringstream tmpBackground(s);
+	tmpBackground >> m_backgroundSize;
+	// Retrieves number of dimenions:
+	getline(myFile, s);
+	istringstream tmpDim(s);
+	tmpDim >> m_columns;
+	// Calculates total rows:
+	m_rows = m_signalSize + m_backgroundSize;
+
+
+	///////////////////////
+	/// ALLOCATES SPACE ///
+	///////////////////////
+
+	// Saves matrix layout:
+	m_inverted = columnsSeq;
+
+	if (m_inverted){
+		// Allocates *k* columns for the data matrix:
+		m_matrix = new data_t*[m_columns];
+		// Allocates *n* rows:
+		for (int j = 0; j < m_columns; j++){
+			m_matrix[j] = new data_t[m_rows];
+		}
+	} else {
+		// Allocates *n* rows for the data matrix:
+		m_matrix = new data_t*[m_rows];
+		// Allocates *k* columns:
+		for (int j = 0; j < m_rows; j++){
+			m_matrix[j] = new data_t[m_columns];
+        }
+	}
+
+	// Allocates space for bitmask of classes:
+	m_class = new Bitmask(m_rows);
+
+	// Allocates space for cluster array:
+	m_cluster = new int[m_rows]();
+
+
+	///////////////////////
+	/// READS ALL LINES ///
+	///////////////////////
+
     // Number of lines read:
     int lineCounter = 0;
+	// Loop to read the entire input file:
     while (getline(myFile, s)) {
         // Helper variable to hold value of elements:
         float value;
-		if (s.empty() == false){
+		if ((s.empty() == false) && (s.front() != "#")){
             // Increases count of lines:
             lineCounter++;
+			// Checks if second class was reached:
+			if (lineCounter > m_signalSize){
+				// Sets bitmask to second class (1):
+				m_class->put(lineCounter, true);
+			}
 			istringstream tmp(s);
             // Loops through elements of line:
-            for (int j=0; j<D; j++){
+            for (int j = 1; j <= m_columns; j++){
                 tmp >> value;
-                put(lineCounter-1, j, value);
+                put(lineCounter, j, value);
             }
 		}
     }
-}
 
-
-
-// Generates *n* elements, each containing *k* attributes:
-void Matrix::generateRandom(bool parallel){
-
-    if (parallel){
-    	// Array of threads:
-    	thread tasks[CORES];
-
-    	// Loops through threads:
-    	for (int threadId = 0; threadId < CORES; threadId++){
-    		// Fires up thread to fill matrix:
-    		tasks[threadId] = thread(&Matrix::fillLinesParallel, this, threadId);
-    	}
-
-    	// Waits until all threads are done:
-    	for (int threadId = 0; threadId < CORES; threadId++){
-    		tasks[threadId].join();
-    	}
-    } else {
-        this->fillLinesSerial();
-    }
 
 }
 
 
-// Dependency function executed by threads to fill a random data matrix:
-void Matrix::fillLinesParallel(int threadId){
-
-    // Randomizes interval of data for each thread:
-    int interval = (threadId+1)*2633 % 200;
-
-	// Number of columns to fill:
-	int each = columns / CORES;
-
-    // RNG init:
-	uniform_int_distribution<int> dice_distribution(interval, 2*interval);
-	mt19937 random_number_engine; // pseudorandom number generator
-	auto dice_roller = bind(dice_distribution, random_number_engine);
-
-	// Loops through designated columns:
-	for (int j = threadId*each; j < threadId*each + each; j++){
-		// Loops through lines:
-		for (int i = 0; i < rows; i++){
-			// Fills in random data:
-			this->put(i, j, dice_roller());
-		}
+// Returns a value in the matrix:
+data_t Matrix::get(int i, int j){
+	if (m_inverted){
+    	return m_matrix[j-1][i-1];
+	} else {
+		return m_matrix[i-1][j-1];
 	}
-
 }
 
-// Dependency function executed by threads to fill a random data matrix:
-void Matrix::fillLinesSerial(){
 
-    // Interval of data:
-    int interval = 500;
-
-    // Seed:
-    srand(time(NULL));
-
-	// Loops through columns:
-	for (int j = 0; j < columns; j++){
-		// Loops through rows:
-		for (int i = 0; i < rows; i++){
-			// Fills in random data:
-			this->put(i, j, rand() % interval);
-		}
+// Saves a value in the matrix:
+data_t Matrix::put(int i, int j, data_t value){
+	if (m_inverted){
+    	m_matrix[j-1][i-1] = value;
+	} else {
+		m_matrix[i-1][j-1] = value;
 	}
-
 }
 
-void Matrix::print(int numRows){
+
+// Retrieves class of register:
+int Matrix::getClassOf(int i){
+	if (m_class->get(i) == true){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+// Retrieves cluster of register:
+int Matrix::getClusterOf(int i){
+	return m_cluster[i-1];
+}
+
+
+// Saves cluster of register:
+void Matrix::putClusterOf(int i, int cluster){
+	m_cluster[i-1] = cluster;
+}
+
+
+
+// Prints all rows from [startRow, endRow)
+void Matrix::print(int startRow, int endRow){
     cout << endl;
     // Loops through lines:
-    for (int i = 0; i < numRows; i++){
+    for (int i = startRow; i < endRow; i++){
         cout << "[";
         // Loops through columns:
-        for (int j = 0; j < columns; j++){
+        for (int j = 0; j < m_columns; j++){
             // Prints data:
             cout << this->get(i, j);
-            if (j != columns-1){
+            if (j != m_columns-1){
                  cout << '\t';
             }
         }
-        cout << "]" << endl;
+        cout << "] ---- Class: " << this->classOf(i) << endl;
     }
     cout << endl;
 }
 
+// Destructor:
 Matrix::~Matrix(){
 
 	// Deletes every columns:
-	for (int j = 0; j < columns; j++){
-		delete[] matrix[j];
+	for (int j = 0; j < m_columns; j++){
+		delete[] m_matrix[j];
 	}
 
-    delete[] matrix;
+    delete[] m_matrix;
 
 }
