@@ -243,7 +243,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 void checkContamination(int threadId, Matrix* matrix){
 
 	// Number of chuncks to check:
-	float each = (pow(K, matrix->getDims))*1.0 / CORES;
+	float each = (pow(K, matrix->getDims()))*1.0 / CORES;
     // Calculates chunck:
     int start = round(threadId*each);
     int end = round((threadId+1)*each);
@@ -266,7 +266,9 @@ void checkContamination(int threadId, Matrix* matrix){
 		double totalPercentage = signalFraction + backgroundFraction;
 		// Makes a min out of 3 values: the % of signal, the % of background or the baseline minimum % defined in the global header:
 		double selectedPercentage = min( min(signalFraction/totalPercentage, backgroundFraction/totalPercentage), PERC_MIN );
-		cout << setprecision(2) << selectedPercentage << endl;
+		cout << setprecision(6) << "Signal %: " << signalFraction/totalPercentage << " --- Selected %: "<< selectedPercentage << endl;
+
+	}
 
 }
 
