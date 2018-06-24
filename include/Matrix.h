@@ -37,10 +37,10 @@ class Matrix {
 		void putClusterOf(int i, int cluster);
 
 		// Retrieves the number of signal registers a cluster has:
-		int getSignalDist(int cluster);
+		double getSignalDist(int cluster);
 
 		// Retrieves the number of background registers a cluster has:
-		int getBackgroundDist(int cluster);
+		double getBackgroundDist(int cluster);
 
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
@@ -55,16 +55,18 @@ class Matrix {
 		void allocateSpace(bool extraArrays);
 
     private:
-        data_t** m_matrix;			// Matrix to hold registers
-		Bitmask* m_class;			// m_class of i returns the class register i-1 belongs to
-		int* m_cluster;				// m_cluster of i returns the cluster register i belongs to
-		int* m_signalDist;		// m_signalDist of i returns the number of signal registers present in cluster i
-		int* m_backgroundDist;	// m_backgroundDist of i returns the number of signal registers present in cluster i
-        int m_rows;					// Total number of registers
-		int m_columns;				// Total dimensions
-		int m_signalSize;			// Total elements of class 0
-		int m_backgroundSize;		// Total elements of class 1
-		bool m_inverted;			// If set, columns will be stored sequentially
+        data_t** m_matrix;				// Matrix to hold registers
+		Bitmask* m_class;				// m_class of i returns the class register i-1 belongs to
+		int* m_cluster;					// m_cluster of i returns the cluster register i belongs to
+		double* m_signalDist;			// m_signalDist of i returns the number of signal registers present in cluster i / m_signalSize
+		double* m_backgroundDist;		// m_backgroundDist of i returns the number of background registers present in cluster i / m_backgroundSize
+        int m_rows;						// Total number of registers
+		int m_columns;					// Total dimensions
+		int m_signalSize;				// Total elements of class 0
+		int m_backgroundSize;			// Total elements of class 1
+		double m_signalFraction;		// 1/m_signalSize
+		double m_backgroundFraction;	// 1/m_backgroundSize
+		bool m_inverted;				// If set, columns will be stored sequentially
 };
 
 #endif // MATRIX_H
