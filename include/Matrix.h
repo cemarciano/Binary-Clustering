@@ -58,14 +58,12 @@ class Matrix {
         data_t** m_matrix;				// Matrix to hold registers
 		Bitmask* m_class;				// m_class of i returns the class register i-1 belongs to
 		int* m_cluster;					// m_cluster of i returns the cluster register i belongs to
-		double* m_signalDist;			// m_signalDist of i returns the number of signal registers present in cluster i / m_signalSize
-		double* m_backgroundDist;		// m_backgroundDist of i returns the number of background registers present in cluster i / m_backgroundSize
+		int* m_signalDist;				// m_signalDist of i returns the number of signal registers present in cluster i / m_signalSize
+		int* m_backgroundDist;			// m_backgroundDist of i returns the number of background registers present in cluster i / m_backgroundSize
         int m_rows;						// Total number of registers
 		int m_columns;					// Total dimensions
 		int m_signalSize;				// Total elements of class 0
 		int m_backgroundSize;			// Total elements of class 1
-		double m_signalFraction;		// 1/m_signalSize
-		double m_backgroundFraction;	// 1/m_backgroundSize
 		bool m_inverted;				// If set, columns will be stored sequentially
 };
 

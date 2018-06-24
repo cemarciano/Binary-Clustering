@@ -44,9 +44,6 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 	// Calculates total rows:
 	m_rows = m_signalSize + m_backgroundSize;
 
-	// Saves fraction of data:
-	m_signalFraction = 1.0/m_signalSize;
-	m_backgroundFraction = 1.0/m_backgroundSize;
 
 
 	///////////////////////
@@ -134,9 +131,9 @@ void Matrix::allocateSpace(bool extraArrays){
 		// Calculates total number of clusters:
 		int totalClusters = pow(K, m_columns);
 		// Allocates space for signal distribution:
-		m_signalDist = new double[totalClusters]();
+		m_signalDist = new int[totalClusters]();
 		// Allocates space for background distribution:
-		m_backgroundDist = new double[totalClusters]();
+		m_backgroundDist = new int[totalClusters]();
 	}
 
 }
@@ -196,9 +193,9 @@ void Matrix::putClusterOf(int i, int cluster){
 	m_cluster[i] = cluster;
 	// Increments the number of registers a cluster has:
 	if (getClassOf(i) == 0){
-		m_signalDist[cluster] += m_signalFraction;
+		m_signalDist[cluster]++;
 	} else {
-		m_backgroundDist[cluster] += m_backgroundFraction;
+		m_backgroundDist[cluster]++;
 	}
 }
 
