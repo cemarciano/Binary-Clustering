@@ -257,16 +257,20 @@ void checkContamination(int threadId, Matrix* matrix){
 
 		// Sets which class contamines the cluster the most:
 		if (signalFraction >= backgroundFraction){
-			// SET CONTAMINATION BITMASK TO 0
+			// Sets cluster i as contamined by class 0:
+			matrix->putContamination(i, false);
 		} else {
-			// SET CONTAMINATION BITMASK TO 1
+			// Sets cluster i as contamined by class 1:
+			matrix->putContamination(i, true);
 		}
 
 		// Calculates the value corresponding to 100%:
-		double totalPercentage = signalFraction + backgroundFraction;
-		// Makes a min out of 3 values: the % of signal, the % of background or the baseline minimum % defined in the global header:
-		double selectedPercentage = min( min(signalFraction/totalPercentage, backgroundFraction/totalPercentage), PERC_MIN );
-		cout << setprecision(6) << "Signal %: " << signalFraction/totalPercentage << " --- Selected %: "<< selectedPercentage << endl;
+		double totalFraction = signalFraction + backgroundFraction;
+		// Prevents division by 0:
+		if (totalFraction == 0) totalFraction = 1;
+		// Takes either the % of signal, the % of background or the baseline minimum % defined in the global header:
+		double selectedPercentage = max( min(signalFraction*1.0/totalFraction, backgroundFraction*1.0/totalFraction), PERC_MIN );
+
 
 	}
 

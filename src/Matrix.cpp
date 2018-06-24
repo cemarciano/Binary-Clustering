@@ -134,6 +134,8 @@ void Matrix::allocateSpace(bool extraArrays){
 		m_signalDist = new int[totalClusters]();
 		// Allocates space for background distribution:
 		m_backgroundDist = new int[totalClusters]();
+		// Allocates space for bitmask of contamination:
+		m_contamination = new Bitmask(totalClusters);
 	}
 
 }
@@ -221,6 +223,18 @@ int Matrix::getSignalSize(){
 // Retrieves total number of background registers:
 int Matrix::getBackgroundSize(){
 	return m_backgroundSize;
+}
+
+
+// Sets cluster as contamined by class classBool (i.e. more elements of classBool exist in this cluster):
+void Matrix::putContamination(int cluster, bool classBool){
+	m_contamination->put(cluster+1, classBool);
+}
+
+
+// Retrieves the class that contamines a cluster:
+bool Matrix::getContamination(int cluster){
+	return m_contamination->get(cluster+1);
 }
 
 

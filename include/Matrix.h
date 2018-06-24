@@ -48,6 +48,12 @@ class Matrix {
 		// Retrieves total number of background registers:
 		int getBackgroundSize();
 
+		// Sets cluster as contamined by class classBool (i.e. more elements of classBool exist in this cluster):
+		void putContamination(int cluster, bool classBool);
+
+		// Retrieves the class that contamines a cluster:
+		void getContamination(int cluster);
+
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
 
@@ -63,6 +69,7 @@ class Matrix {
     private:
         data_t** m_matrix;				// Matrix to hold registers
 		Bitmask* m_class;				// m_class of i returns the class register i-1 belongs to
+		Bitmask* m_contamination;		// m_contamination of i returns the class that contamines cluster i the most
 		int* m_cluster;					// m_cluster of i returns the cluster register i belongs to
 		int* m_signalDist;				// m_signalDist of i returns the number of signal registers present in cluster i / m_signalSize
 		int* m_backgroundDist;			// m_backgroundDist of i returns the number of background registers present in cluster i / m_backgroundSize
