@@ -17,6 +17,7 @@ int* powArr;
 void binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
+void printArray(data_t* arr, int size);
 
 
 // Main program:
@@ -74,19 +75,13 @@ void binaryClustering(Matrix* matrix){
 	}
 
     // Prints centroid values:
-	cout << endl << "Centroid vector:" << endl;
-    for (int i = 0; i < matrix->getDims(); i++){
-        cout << centroids[i];
-		if (i != matrix->getDims()-1) cout << " - ";
-    }
-	cout << endl;
+	cout << endl << "Centroid vector:";
+    printArray(centroids, matrix->getDims());
+
 	// Prints stddev values:
-	cout << endl << "StdDev vector:" << endl;
-    for (int i = 0; i < matrix->getDims(); i++){
-        cout << stdDev[i];
-		if (i != matrix->getDims()-1) cout << " - ";
-    }
-	cout << endl;
+	cout << endl << "StdDev vector:";
+    printArray(stdDev, matrix->getDims());
+
 
 	/***************************/
     /*** DIVISION BOUNDARIES ***/
@@ -188,6 +183,14 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 }
 
 
+// Prints the content of a given array:
+void printArray(data_t* arr, int size){
+	cout << endl << "[";
+	for (int i = 0; i < size; i++){
+        cout << setw(10) << arr[i] << '\t';
+    }
+	cout << "]" << endl;
+}
 
 
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
