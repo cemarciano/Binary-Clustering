@@ -36,11 +36,17 @@ class Matrix {
 		// Saves cluster of data:
 		void putClusterOf(int i, int cluster);
 
+		// Signals that cluster has size signal registers:
+		void putSignalDist(int cluster, int size);
+
+		// Signals that cluster has size background registers:
+		void putBackgroundDist(int cluster, int size);
+
 		// Retrieves the number of signal registers a cluster has:
-		double getSignalDist(int cluster);
+		int getSignalDist(int cluster);
 
 		// Retrieves the number of background registers a cluster has:
-		double getBackgroundDist(int cluster);
+		int getBackgroundDist(int cluster);
 
 		// Retrieves total number of signal registers:
 		int getSignalSize();

@@ -251,9 +251,13 @@ void checkContamination(int threadId, Matrix* matrix){
 	// Loops through designated clusters:
 	for (int i = start; i < end; i++){
 
+		// Retrieves total signal and background present in this cluster:
+		int currentSignal = matrix->getSignalDist(i);
+		int currentBackground = matrix->getBackgroundDist(i);
+
 		// Puts both classes in the same scale of comparison (num in cluster / total registers of class):
-		double signalFraction = matrix->getSignalDist(i)*1.0 / matrix->getSignalSize();
-		double backgroundFraction = matrix->getBackgroundDist(i)*1.0 / matrix->getBackgroundSize();
+		double signalFraction = currentSignal*1.0 / matrix->getSignalSize();
+		double backgroundFraction = currentBackground*1.0 / matrix->getBackgroundSize();
 
 		// Sets which class contamines the cluster the most:
 		if (signalFraction >= backgroundFraction){
@@ -271,11 +275,16 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Takes either the % of signal, the % of background or the baseline minimum % defined in the global header:
 		double selectedPercentage = max( min(signalFraction*1.0/totalFraction, backgroundFraction*1.0/totalFraction), PERC_MIN );
 
-		// Calculates total registers in this cluster:
-		int clusterSize = matrix->getSignalDist(i) + matrix->getBackgroundDist(i);
-		// Obtains the total number of registers this cluster will yield:
-		cout << "Cluster " << i << " had " << clusterSize << " registers and will now yield " << (int) clusterSize*selectedPercentage << " registers." << endl;
 
+		// Calculates total registers in this cluster:
+		int clusterSize = currentSignal + currentBackground;
+		cout << "Cluster " << i << " had " << clusterSize;
+		// Obtains the total number of registers this cluster will yield, taking into account global percentage multiplier:
+		clusterSize *= (selectedPercentage*PERC_MULT);
+		// Calculates individual class yields within this cluster:
+		int currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
+		int currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize );
+		cout << " and now has " << clusterSize << ", where Signal = " << currentSignal << " and Background = " << currentBackground << endl;
 	}
 
 }

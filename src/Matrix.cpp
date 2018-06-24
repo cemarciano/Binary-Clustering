@@ -201,15 +201,24 @@ void Matrix::putClusterOf(int i, int cluster){
 	}
 }
 
+// Signals that cluster has size signal registers:
+void putSignalDist(int cluster, int size){
+	m_signalDist[cluster] = size;
+}
+
+// Signals that cluster has size background registers:
+void putBackgroundDist(int cluster, int size){
+	m_backgroundDist[cluster] = size;
+}
 
 // Retrieves the number of signal registers a cluster has divided by m_signalSize:
-double Matrix::getSignalDist(int cluster){
+int Matrix::getSignalDist(int cluster){
 	return m_signalDist[cluster];
 }
 
 
 // Retrieves the number of background registers a cluster has divided by m_backgroundSize:
-double Matrix::getBackgroundDist(int cluster){
+int Matrix::getBackgroundDist(int cluster){
 	return m_backgroundDist[cluster];
 }
 
