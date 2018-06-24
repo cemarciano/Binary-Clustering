@@ -50,7 +50,8 @@ int main(){
 				cluster = i;
 			}
 		}
-		cout << endl << "Most signal elements: " << max << " elements in cluster " << cluster << endl << endl;
+		cout << endl << "Most signal elements: " << max << " elements in cluster " << cluster << endl;
+		cout << "Background registers in this same cluster are " << data.getBackgroundDist(cluster) << " in total"<< endl << endl;
 		max = 0;
 		cluster = -1;
 		for (int i=0; i<pow(K, data.getDims()); i++){
@@ -60,6 +61,7 @@ int main(){
 			}
 		}
 		cout << endl << "Most background elements: " << max << " elements in cluster " << cluster << endl << endl;
+		cout << "Signal registers in this same cluster are " << data.getSignalDist(cluster) << " in total"<< endl << endl;
 	}
 
 	// Prints out elapsed time:
