@@ -18,6 +18,12 @@ class Matrix {
         // Saves a value in the matrix:
         data_t put(int i, int j, data_t value);
 
+		// Retrieves number of rows:
+		int getRows();
+
+		// Retrieves number of columns:
+		int getColumns();
+
 		// Retrieves class of data:
 		int getClassOf(int i);
 

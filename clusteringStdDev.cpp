@@ -55,9 +55,9 @@ void binaryClustering(Matrix* matrix){
     /****************************/
 
     // Allocates centroid array:
-    data_t* centroids = new data_t[D]();
+    data_t* centroids = new data_t[ matrix->getColumns() ]();
 	// Allocates stddev array:
-    data_t* stdDev = new data_t[D]();
+    data_t* stdDev = new data_t[ matrix->getColumns() ]();
 
     // Array of threads:
 	thread centroidTasks[CORES];
@@ -88,7 +88,7 @@ void binaryClustering(Matrix* matrix){
     /***************************/
 
 	// Creates matrix D-DIMENSIONS by K-DIVISIONS:
-	Matrix boundaries(D, K);
+	Matrix boundaries(matrix->getColumns(), K);
 
 	// Step to divide boundaries with:
 	float step;
@@ -101,7 +101,7 @@ void binaryClustering(Matrix* matrix){
 		step = -1*(1.0*(K - 2)/2);
 	}
 	// Runs through dimensions of matrix:
-	for (int i = 0; i < D; i++){
+	for (int i = 0; i < matrix->getColumns(); i++){
 		// Runs through each division:
 		for (int j = 0; j < K-1; j++){
 			// Saves the value of the boundary:
@@ -151,7 +151,7 @@ void binaryClustering(Matrix* matrix){
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = D*1.0 / CORES;
+	float each = (matrix->getColumns)*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -165,11 +165,11 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
         // Accumulator:
         data_t acc = 0;
         // Loops through lines:
-		for (int i = 0; i < N; i++){
+		for (int i = 0; i < matrix->getRows(); i++){
             acc += matrix->get(i, j);
         }
         // Writes accumulator mean:
-        centroids[j] = acc / N;
+        centroids[j] = acc / matrix->getRows();
 
 		// STDDEV:
 

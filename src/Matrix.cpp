@@ -94,9 +94,9 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 			}
 			istringstream tmp(s);
             // Loops through elements of line:
-            for (int j = 1; j <= m_columns; j++){
+            for (int j = 0; j < m_columns; j++){
                 tmp >> value;
-                put(lineCounter, j, value);
+                this->put(lineCounter-1, j, value);
             }
 		}
     }
@@ -108,9 +108,9 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 // Returns a value in the matrix:
 data_t Matrix::get(int i, int j){
 	if (m_inverted){
-    	return m_matrix[j-1][i-1];
+    	return m_matrix[j][i];
 	} else {
-		return m_matrix[i-1][j-1];
+		return m_matrix[i][j];
 	}
 }
 
@@ -118,16 +118,28 @@ data_t Matrix::get(int i, int j){
 // Saves a value in the matrix:
 data_t Matrix::put(int i, int j, data_t value){
 	if (m_inverted){
-    	m_matrix[j-1][i-1] = value;
+    	m_matrix[j][i] = value;
 	} else {
-		m_matrix[i-1][j-1] = value;
+		m_matrix[i][j] = value;
 	}
+}
+
+
+// Retrieves number of rows:
+int getRows(){
+	return m_rows;
+}
+
+
+// Retrieves number of columns:
+int getColumns(){
+	return m_columns;
 }
 
 
 // Retrieves class of register:
 int Matrix::getClassOf(int i){
-	if (m_class->get(i) == true){
+	if (m_class->get(i+1) == true){
 		return 1;
 	} else {
 		return 0;
@@ -136,13 +148,13 @@ int Matrix::getClassOf(int i){
 
 // Retrieves cluster of register:
 int Matrix::getClusterOf(int i){
-	return m_cluster[i-1];
+	return m_cluster[i];
 }
 
 
 // Saves cluster of register:
 void Matrix::putClusterOf(int i, int cluster){
-	m_cluster[i-1] = cluster;
+	m_cluster[i] = cluster;
 }
 
 
@@ -150,12 +162,12 @@ void Matrix::putClusterOf(int i, int cluster){
 // Prints all rows from [startRow, endRow)
 void Matrix::print(int startRow, int endRow){
 	// Treats invalid startRow values:
-	if (startRow < 1){
-		startRow = 1;
+	if (startRow < 0){
+		startRow = 0;
 	}
 	// Treats invalid endRow values:
-	if (endRow > m_rows+1){
-		endRow = m_rows+1;
+	if (endRow > m_rows){
+		endRow = m_rows;
 	}
     cout << endl;
     // Loops through lines:
