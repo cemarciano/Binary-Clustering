@@ -204,7 +204,7 @@ void Matrix::print(int startRow, int endRow){
                  cout << '\t';
             }
         }
-        cout << "] ---- Class: " << this->getClassOf(i) << endl;
+        cout << "] ---- Class " << this->getClassOf(i) << ", Cluster " << this->getClusterOf(i) << endl;
     }
     cout << endl;
 }
