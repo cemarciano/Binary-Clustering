@@ -144,7 +144,7 @@ void binaryClustering(Matrix* matrix){
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = (matrix->getDims)*1.0 / CORES;
+	float each = (matrix->getDims())*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -171,7 +171,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 		// Current centroid:
 		data_t currCentroid = centroids[j];
         // Loops through lines:
-		for (int i = 0; i < N; i++){
+		for (int i = 0; i < matrix->getRows(); i++){
             acc += pow( matrix->get(i, j) - currCentroid, 2);
         }
         // Writes accumulator stddev:
@@ -183,10 +183,10 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 
 
 
-void clusterSplitting(int threadId, Matrix* boundaries, Bitmask* Matrix* matrix){
+void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 
     // Number of lines to check:
-	float each = N*1.0 / CORES;
+	float each = (matrix->getRows())*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -197,7 +197,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Bitmask* Matrix* matrix)
         // Memory position accumulator:
         int memAcc = 1;
         // Loops through columns:
-        for (int j = 0; j < D; j++){
+        for (int j = 0; j < matrix->getDims(); j++){
             // Loops through boundaries:
             for (int k = 0; k < K; k++){
                 //if (threadId == 0) cout << "Got " << matrix->get(i, j) << " and comparing to boundary " << boundaries->get(j,k) << endl;
@@ -212,6 +212,6 @@ void clusterSplitting(int threadId, Matrix* boundaries, Bitmask* Matrix* matrix)
         }
         //cout << "memAcc = " << memAcc << endl;
         // Assigns a cluster to the data:
-        marix->putClusterOf(i, memAcc);
+        matrix->putClusterOf(i, memAcc);
     }
 }

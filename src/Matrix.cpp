@@ -149,13 +149,13 @@ data_t Matrix::put(int i, int j, data_t value){
 
 
 // Retrieves number of rows:
-int getRows(){
+int Matrix::getRows(){
 	return m_rows;
 }
 
 
 // Retrieves number of columns:
-int getDims(){
+int Matrix::getDims(){
 	return m_columns;
 }
 
