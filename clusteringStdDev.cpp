@@ -40,6 +40,28 @@ int main(){
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
 
+	// CHECKING MAX CLUSTER, PLS REMOVE LATER
+	{
+		int max = 0;
+		int cluster = -1;
+		for (int i=0; i<pow(K, data.getDims()); i++){
+			if (data.getSignalDist(i) > max){
+				max = data.getSignalDist(i);
+				cluster = i;
+			}
+		}
+		cout << endl << "Most signal elements: " << max << " elements in cluster " << cluster << endl << endl;
+		max = 0;
+		cluster = -1;
+		for (int i=0; i<pow(K, data.getDims()); i++){
+			if (data.getBackgroundDist(i) > max){
+				max = data.getBackgroundDist(i);
+				cluster = i;
+			}
+		}
+		cout << endl << "Most background elements: " << max << " elements in cluster " << cluster << endl << endl;
+	}
+
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
