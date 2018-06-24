@@ -221,7 +221,7 @@ void Matrix::print(int startRow, int endRow){
 	if (endRow > m_rows){
 		endRow = m_rows;
 	}
-    cout << endl;
+    cout << endl << "Printing rows " << startRow << " to " << endRow-1 << ":" << endl;
     // Loops through lines:
     for (int i = startRow; i < endRow; i++){
         cout << "[";

@@ -60,7 +60,7 @@ int main(){
 				cluster = i;
 			}
 		}
-		cout << endl << "Most background elements: " << max << " elements in cluster " << cluster << endl << endl;
+		cout << endl << "Most background elements: " << max << " elements in cluster " << cluster << endl;
 		cout << "Signal registers in this same cluster are " << data.getSignalDist(cluster) << " in total"<< endl << endl;
 	}
 
