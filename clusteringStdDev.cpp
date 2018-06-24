@@ -74,14 +74,15 @@ void binaryClustering(Matrix* matrix){
     // Prints centroid values:
 	cout << endl << "Centroid vector:" << endl;
     for (int i = 0; i < matrix->getDims(); i++){
-        cout << centroids[i] << " - ";
-		if (i != matrix->getDims()-1) << " - ";
+        cout << centroids[i];
+		if (i != matrix->getDims()-1) cout << " - ";
     }
+	cout << endl;
 	// Prints stddev values:
 	cout << endl << "StdDev vector:" << endl;
     for (int i = 0; i < matrix->getDims(); i++){
         cout << stdDev[i];
-		if (i != matrix->getDims()-1) << " - ";
+		if (i != matrix->getDims()-1) cout << " - ";
     }
 	cout << endl;
 
