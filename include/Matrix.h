@@ -36,6 +36,12 @@ class Matrix {
 		// Saves cluster of data:
 		void putClusterOf(int i, int cluster);
 
+		// Retrieves the number of signal registers a cluster has:
+		int getSignalDist(int cluster);
+
+		// Retrieves the number of background registers a cluster has:
+		int getBackgroundDist(int cluster);
+
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
 
@@ -44,13 +50,16 @@ class Matrix {
 
 	protected:
 
-		// Uses previously set information to allocate storage space:
-		void allocateSpace();
+		// Uses previously set information to allocate storage space. If extraArrays is true, also
+		// allocates space for m_class, m_cluster, m_signalDist, m_backgroundDist:
+		void allocateSpace(bool extraArrays);
 
     private:
         data_t** m_matrix;			// Matrix to hold registers
-		Bitmask* m_class;			// m_class of i returns the class register i belongs to
+		Bitmask* m_class;			// m_class of i returns the class register i-1 belongs to
 		int* m_cluster;				// m_cluster of i returns the cluster register i belongs to
+		int* m_signalDist		// m_signalDist of i returns the number of signal registers present in cluster i
+		int* m_backgroundDist	// m_backgroundDist of i returns the number of signal registers present in cluster i
         int m_rows;					// Total number of registers
 		int m_columns;				// Total dimensions
 		int m_signalSize;			// Total elements of class 0

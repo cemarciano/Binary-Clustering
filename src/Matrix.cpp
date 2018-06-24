@@ -1,6 +1,6 @@
 #include <iostream>			// For basic input and output
 #include <fstream>
-#include <cmath>            // Math routines
+#include <cmath>            // To calculate pow in space allocation
 #include <thread>			// To parallelize computation
 #include <random>			// For random data generation
 #include <sstream>
@@ -53,7 +53,7 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 	m_inverted = columnsSeq;
 
 	// Allocates storage space:
-	this->allocateSpace();
+	this->allocateSpace(true);
 
 
 	///////////////////////
@@ -96,13 +96,14 @@ Matrix::Matrix(int rows, int columns, bool columnsSeq){
 	m_inverted = columnsSeq;
 
 	// Allocates storage space:
-	this->allocateSpace();
+	this->allocateSpace(false);
 
 }
 
 
-// Uses previously set information to allocate storage space:
-void Matrix::allocateSpace(){
+// Uses previously set information to allocate storage space. If extraArrays is true, also
+// allocates space for m_class, m_cluster, m_signalDist, m_backgroundDist:
+void Matrix::allocateSpace(bool extraArrays){
 	// Checks if columns should be stored sequentially:
 	if (m_inverted){
 		// Allocates *k* columns for the data matrix:
@@ -120,11 +121,17 @@ void Matrix::allocateSpace(){
         }
 	}
 
-	// Allocates space for bitmask of classes:
-	m_class = new Bitmask(m_rows);
-
-	// Allocates space for cluster array:
-	m_cluster = new int[m_rows]();
+	// If extra arrays (described in method description) should be allocated, do it:
+	if (extraArrays == true){
+		// Allocates space for bitmask of classes:
+		m_class = new Bitmask(m_rows);
+		// Allocates space for cluster array:
+		m_cluster = new int[m_rows]();
+		// Allocates space for signal distribution:
+		m_signalDist = new int[ pow(K, m_columns)) ]();
+		// Allocates space for background distribution:
+		m_backgroundDist = new int[ pow(K, m_columns)) ]();
+	}
 
 }
 
@@ -176,11 +183,30 @@ int Matrix::getClusterOf(int i){
 }
 
 
+
 // Saves cluster of register:
 void Matrix::putClusterOf(int i, int cluster){
+	// Sets cluster of register:
 	m_cluster[i] = cluster;
+	// Increments the number of registers a cluster has:
+	if (getClassOf(i) == 0){
+		m_signalDist[cluster]++;
+	} else {
+		m_backgroundDist[cluster]++;
+	}
 }
 
+
+// Retrieves the number of signal registers a cluster has:
+int getSignalDist(int cluster){
+	return m_signalDist[cluster];
+}
+
+
+// Retrieves the number of background registers a cluster has:
+int getBackgroundDist(int cluster){
+	return m_backgroundDist[cluster];
+}
 
 
 // Prints all rows from [startRow, endRow)

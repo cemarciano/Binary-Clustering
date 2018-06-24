@@ -126,6 +126,10 @@ void binaryClustering(Matrix* matrix){
         powArr[i] = pow(K,i);
     }
 
+	// Arrays cointaining fraction of data in a cluster:
+	double* signalDist = new double[ pow(K, matrix->getDims()) ]();
+	double* backgroundDist = new double[ pow(K, matrix->getDims()) ]();
+
 
     // Array of threads:
 	std::thread splittingTasks[CORES];
@@ -144,6 +148,8 @@ void binaryClustering(Matrix* matrix){
 
 }
 
+
+// Job to calculate the centroid for each dimension:
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
@@ -184,17 +190,8 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 }
 
 
-// Prints the content of a given array:
-void printArray(data_t* arr, int size){
-	cout << endl << "[";
-	for (int i = 0; i < size; i++){
-        cout << setw(10) << arr[i];
-		if (i != size-1) cout << '\t';
-    }
-	cout << "]" << endl;
-}
 
-
+// Job to assign a cluster number to each register:
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 
     // Number of lines to check:
@@ -207,23 +204,32 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
     // Loops through designated lines:
 	for (int i = start; i < end; i++){
         // Memory position accumulator:
-        int memAcc = 1;
+        int memAcc = 0;
         // Loops through columns:
         for (int j = 0; j < matrix->getDims(); j++){
             // Loops through boundaries:
             for (int k = 0; k < K; k++){
-                //if (threadId == 0) cout << "Got " << matrix->get(i, j) << " and comparing to boundary " << boundaries->get(j,k) << endl;
                 // Checks if data is to the left of boundary:
                 if (matrix->get(i, j) < boundaries->get(j,k)){
-                    //if (threadId == 0) cout << "Comparison was successfull, adding "<< powArr[j] + k - 1 << endl;
                     // Moves the memory position further (sets 1 in bitmask, represented in 10s):
                     memAcc += powArr[j]*k;
                     break;
                 }
             }
         }
-        //cout << "memAcc = " << memAcc << endl;
+
         // Assigns a cluster to the data:
         matrix->putClusterOf(i, memAcc);
     }
+}
+
+
+// Prints the content of a given array:
+void printArray(data_t* arr, int size){
+	cout << endl << "[";
+	for (int i = 0; i < size; i++){
+        cout << setw(10) << arr[i];
+		if (i != size-1) cout << '\t';
+    }
+	cout << "]" << endl;
 }
