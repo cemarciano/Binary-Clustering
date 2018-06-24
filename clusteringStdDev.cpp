@@ -23,7 +23,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
 int main(){
 
 	// Loads the data matrix:
-	Matrix data("/home/cadu/signal.txt", true);
+	Matrix data("/home/cemarciano/Documents/fullDataset.txt", true);
 
     // Starts the stopwatch:
 	struct timespec start, finish;
@@ -31,7 +31,7 @@ int main(){
     cout << "Start!" << endl;
 
     // Runs binary clustering algorithm:
-    //binaryClustering(&data);
+    binaryClustering(&data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -72,14 +72,18 @@ void binaryClustering(Matrix* matrix){
 	}
 
     // Prints centroid values:
+	cout << endl << "Centroid vector:" << endl;
     for (int i = 0; i < matrix->getDims(); i++){
         cout << centroids[i] << " - ";
+		if (i != matrix->getDims()-1) << " - ";
+    }
+	// Prints stddev values:
+	cout << endl << "StdDev vector:" << endl;
+    for (int i = 0; i < matrix->getDims(); i++){
+        cout << stdDev[i];
+		if (i != matrix->getDims()-1) << " - ";
     }
 	cout << endl;
-	// Prints stddev values:
-    for (int i = 0; i < matrix->getDims(); i++){
-        cout << stdDev[i] << " - ";
-    }
 
 	/***************************/
     /*** DIVISION BOUNDARIES ***/
