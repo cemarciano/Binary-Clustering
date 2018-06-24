@@ -52,7 +52,7 @@ class Matrix {
 		void putContamination(int cluster, bool classBool);
 
 		// Retrieves the class that contamines a cluster:
-		void getContamination(int cluster);
+		bool getContamination(int cluster);
 
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);

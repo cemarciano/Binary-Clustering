@@ -248,7 +248,7 @@ void checkContamination(int threadId, Matrix* matrix){
     int start = round(threadId*each);
     int end = round((threadId+1)*each);
 
-	// Loops through designated chuncks:
+	// Loops through designated clusters:
 	for (int i = start; i < end; i++){
 
 		// Puts both classes in the same scale of comparison (num in cluster / total registers of class):
@@ -257,10 +257,10 @@ void checkContamination(int threadId, Matrix* matrix){
 
 		// Sets which class contamines the cluster the most:
 		if (signalFraction >= backgroundFraction){
-			// Sets cluster i as contamined by class 0:
+			// Sets cluster i as contamined by signal (class 0):
 			matrix->putContamination(i, false);
 		} else {
-			// Sets cluster i as contamined by class 1:
+			// Sets cluster i as contamined by background (class 1):
 			matrix->putContamination(i, true);
 		}
 
@@ -271,6 +271,10 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Takes either the % of signal, the % of background or the baseline minimum % defined in the global header:
 		double selectedPercentage = max( min(signalFraction*1.0/totalFraction, backgroundFraction*1.0/totalFraction), PERC_MIN );
 
+		// Calculates total registers in this cluster:
+		int clusterSize = matrix->getSignalDist(i) + matrix->getBackgroundDist(i);
+		// Obtains the total number of registers this cluster will yield:
+		cout << "Cluster " << i << " had " << clusterSize << " and will now yield " << clusterSize *= selectedPercentage << " registers." << endl;
 
 	}
 
