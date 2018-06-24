@@ -84,7 +84,7 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
     while (getline(myFile, s)) {
         // Helper variable to hold value of elements:
         float value;
-		if ((s.empty() == false) && (s.front() != "#")){
+		if ((s.empty() == false) && (s[0] != '#')){
             // Increases count of lines:
             lineCounter++;
 			// Checks if second class was reached:
@@ -169,7 +169,7 @@ void Matrix::print(int startRow, int endRow){
                  cout << '\t';
             }
         }
-        cout << "] ---- Class: " << this->classOf(i) << endl;
+        cout << "] ---- Class: " << this->getClassOf(i) << endl;
     }
     cout << endl;
 }
