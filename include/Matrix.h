@@ -42,6 +42,12 @@ class Matrix {
 		// Retrieves the number of background registers a cluster has:
 		double getBackgroundDist(int cluster);
 
+		// Retrieves total number of signal registers:
+		int getSignalSize();
+
+		// Retrieves total number of background registers:
+		int getBackgroundSize();
+
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
 

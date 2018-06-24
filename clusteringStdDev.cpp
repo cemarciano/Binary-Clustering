@@ -18,6 +18,7 @@ int* powArr;
 void binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
+void checkContamination(int threadId, Matrix* matrix);
 void printArray(data_t* arr, int size);
 
 
@@ -39,30 +40,6 @@ int main(){
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
-
-	// CHECKING MAX CLUSTER, PLS REMOVE LATER
-	{
-		int max = 0;
-		int cluster = -1;
-		for (int i=0; i<pow(K, data.getDims()); i++){
-			if (data.getSignalDist(i) > max){
-				max = data.getSignalDist(i);
-				cluster = i;
-			}
-		}
-		cout << endl << "Most signal elements: " << max << " elements in cluster " << cluster << endl;
-		cout << "Background registers in this same cluster are " << data.getBackgroundDist(cluster) << " in total"<< endl << endl;
-		max = 0;
-		cluster = -1;
-		for (int i=0; i<pow(K, data.getDims()); i++){
-			if (data.getBackgroundDist(i) > max){
-				max = data.getBackgroundDist(i);
-				cluster = i;
-			}
-		}
-		cout << endl << "Most background elements: " << max << " elements in cluster " << cluster << endl;
-		cout << "Signal registers in this same cluster are " << data.getSignalDist(cluster) << " in total"<< endl << endl;
-	}
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -143,7 +120,7 @@ void binaryClustering(Matrix* matrix){
     /*************************/
 
 
-    // Array containing future indexes of clusters:
+    // Array containing future indexes of clusters (in base K):
     powArr = new int[ matrix->getDims() ];
     // Fills the array with powers of the number of divisions:
     for (int i = 0; i < matrix->getDims(); i++){
@@ -166,6 +143,24 @@ void binaryClustering(Matrix* matrix){
 	}
 
 
+
+    /***************************************/
+    /*** CHECK CONTAMINATION OF CLUSTERS ***/
+    /***************************************/
+
+	// Array of threads:
+	std::thread contaminationTasks[CORES];
+
+	// Loops through threads:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		// Fires up thread to fill matrix:
+		contaminationTasks[threadId] = thread(checkContamination, threadId, matrix);
+	}
+
+	// Waits until all threads are done:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		contaminationTasks[threadId].join();
+	}
 }
 
 
@@ -241,6 +236,38 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
         // Assigns a cluster to the data:
         matrix->putClusterOf(i, memAcc);
     }
+}
+
+
+// Job to assign a cluster number to each register:
+void checkContamination(int threadId, Matrix* matrix){
+
+	// Number of chuncks to check:
+	float each = (pow(K, matrix->getDims))*1.0 / CORES;
+    // Calculates chunck:
+    int start = round(threadId*each);
+    int end = round((threadId+1)*each);
+
+	// Loops through designated chuncks:
+	for (int i = start; i < end; i++){
+
+		// Puts both classes in the same scale of comparison (num in cluster / total registers of class):
+		double signalFraction = matrix->getSignalDist(i)*1.0 / matrix->getSignalSize();
+		double backgroundFraction = matrix->getBackgroundDist(i)*1.0 / matrix->getBackgroundSize();
+
+		// Sets which class contamines the cluster the most:
+		if (signalFraction >= backgroundFraction){
+			// SET CONTAMINATION BITMASK TO 0
+		} else {
+			// SET CONTAMINATION BITMASK TO 1
+		}
+
+		// Calculates the value corresponding to 100%:
+		double totalPercentage = signalFraction + backgroundFraction;
+		// Makes a min out of 3 values: the % of signal, the % of background or the baseline minimum % defined in the global header:
+		double selectedPercentage = min( min(signalFraction/totalPercentage, backgroundFraction/totalPercentage), PERC_MIN );
+		cout << setprecision(2) << selectedPercentage << endl;
+
 }
 
 

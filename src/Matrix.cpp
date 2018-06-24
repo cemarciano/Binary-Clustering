@@ -212,6 +212,18 @@ double Matrix::getBackgroundDist(int cluster){
 }
 
 
+// Retrieves total number of signal registers:
+int Matrix::getSignalSize(){
+	return m_signalSize;
+}
+
+
+// Retrieves total number of background registers:
+int Matrix::getBackgroundSize(){
+	return m_backgroundSize;
+}
+
+
 // Prints all rows from [startRow, endRow)
 void Matrix::print(int startRow, int endRow){
 	// Treats invalid startRow values:
