@@ -4,6 +4,7 @@
 #include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
 #include <limits>           // To use infinity
+#include <iomanip>			// For printing arrays
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
 #include <unistd.h>
@@ -187,7 +188,8 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 void printArray(data_t* arr, int size){
 	cout << endl << "[";
 	for (int i = 0; i < size; i++){
-        cout << setw(10) << arr[i] << '\t';
+        cout << setw(10) << arr[i];
+		if (i != size-1) cout << '\t';
     }
 	cout << "]" << endl;
 }
