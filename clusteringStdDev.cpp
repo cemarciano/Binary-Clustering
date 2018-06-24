@@ -259,7 +259,7 @@ void checkContamination(int threadId, Matrix* matrix){
 		double signalFraction = currentSignal*1.0 / matrix->getSignalSize();
 		double backgroundFraction = currentBackground*1.0 / matrix->getBackgroundSize();
 
-		// Sets which class contamines the cluster the most:
+		// Sets which class contamines this cluster the most:
 		if (signalFraction >= backgroundFraction){
 			// Sets cluster i as contamined by signal (class 0):
 			matrix->putContamination(i, false);
@@ -268,6 +268,8 @@ void checkContamination(int threadId, Matrix* matrix){
 			matrix->putContamination(i, true);
 		}
 
+		// Calculates a percentage of how much of this cluster should be retained:
+
 		// Calculates the value corresponding to 100%:
 		double totalFraction = signalFraction + backgroundFraction;
 		// Prevents division by 0:
@@ -275,16 +277,18 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Takes either the % of signal, the % of background or the baseline minimum % defined in the global header:
 		double selectedPercentage = max( min(signalFraction*1.0/totalFraction, backgroundFraction*1.0/totalFraction), PERC_MIN );
 
+		// Calculates and saves individual class yields:
 
 		// Calculates total registers in this cluster:
 		int clusterSize = currentSignal + currentBackground;
-		cout << "Cluster " << i << " had " << clusterSize;
 		// Obtains the total number of registers this cluster will yield, taking into account global percentage multiplier:
 		clusterSize *= (selectedPercentage*PERC_MULT);
 		// Calculates individual class yields within this cluster:
 		currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
-		currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize );
-		cout << " and now has " << clusterSize << ", where Signal = " << currentSignal << " and Background = " << currentBackground << endl;
+		currentBackground = clusterSize - currentSignal;
+		// Saves available quantity of registers:
+		matrix->putSignalDist(i, currentSignal);
+		matrix->putBackgroundDist(i, currentBackground);
 	}
 
 }
