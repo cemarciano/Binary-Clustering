@@ -202,12 +202,12 @@ void Matrix::putClusterOf(int i, int cluster){
 }
 
 // Signals that cluster has size signal registers:
-void putSignalDist(int cluster, int size){
+void Matrix::putSignalDist(int cluster, int size){
 	m_signalDist[cluster] = size;
 }
 
 // Signals that cluster has size background registers:
-void putBackgroundDist(int cluster, int size){
+void Matrix::putBackgroundDist(int cluster, int size){
 	m_backgroundDist[cluster] = size;
 }
 

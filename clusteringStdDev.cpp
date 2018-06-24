@@ -282,8 +282,8 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Obtains the total number of registers this cluster will yield, taking into account global percentage multiplier:
 		clusterSize *= (selectedPercentage*PERC_MULT);
 		// Calculates individual class yields within this cluster:
-		int currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
-		int currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize );
+		currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
+		currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize );
 		cout << " and now has " << clusterSize << ", where Signal = " << currentSignal << " and Background = " << currentBackground << endl;
 	}
 
