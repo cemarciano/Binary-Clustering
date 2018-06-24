@@ -33,6 +33,8 @@ int main(){
     // Runs binary clustering algorithm:
     binaryClustering(&data);
 
+	data.print(0, 20);
+
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
 

@@ -1,9 +1,10 @@
-#include <iostream>
+#include <iostream>			// For basic input and output
 #include <fstream>
 #include <cmath>            // Math routines
 #include <thread>			// To parallelize computation
 #include <random>			// For random data generation
 #include <sstream>
+#include <iomanip>			// For printing tables
 #include "Matrix.h"
 
 using namespace std;
@@ -199,7 +200,7 @@ void Matrix::print(int startRow, int endRow){
         // Loops through columns:
         for (int j = 0; j < m_columns; j++){
             // Prints data:
-            cout << this->get(i, j);
+            cout << setw(10) << this->get(i, j);
             if (j != m_columns-1){
                  cout << '\t';
             }
