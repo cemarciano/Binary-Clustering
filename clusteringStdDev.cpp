@@ -175,7 +175,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
             acc += pow( matrix->get(i, j) - currCentroid, 2);
         }
         // Writes accumulator stddev:
-        stdDev[j] = sqrt(acc/N);
+        stdDev[j] = sqrt(acc/matrix->getRows());
     }
 
 }
