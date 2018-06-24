@@ -149,6 +149,14 @@ void Matrix::putClusterOf(int i, int cluster){
 
 // Prints all rows from [startRow, endRow)
 void Matrix::print(int startRow, int endRow){
+	// Treats invalid startRow values:
+	if (startRow < 1){
+		startRow = 1;
+	}
+	// Treats invalid endRow values:
+	if (endRow > m_rows+1){
+		endRow = m_rows+1;
+	}
     cout << endl;
     // Loops through lines:
     for (int i = startRow; i < endRow; i++){

@@ -33,7 +33,7 @@ int main(){
     cout << "Start!" << endl;
 
     // Runs binary clustering algorithm:
-    binaryClustering(&data);
+    //binaryClustering(&data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
