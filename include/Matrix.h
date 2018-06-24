@@ -58,8 +58,8 @@ class Matrix {
         data_t** m_matrix;			// Matrix to hold registers
 		Bitmask* m_class;			// m_class of i returns the class register i-1 belongs to
 		int* m_cluster;				// m_cluster of i returns the cluster register i belongs to
-		int* m_signalDist		// m_signalDist of i returns the number of signal registers present in cluster i
-		int* m_backgroundDist	// m_backgroundDist of i returns the number of signal registers present in cluster i
+		int* m_signalDist;		// m_signalDist of i returns the number of signal registers present in cluster i
+		int* m_backgroundDist;	// m_backgroundDist of i returns the number of signal registers present in cluster i
         int m_rows;					// Total number of registers
 		int m_columns;				// Total dimensions
 		int m_signalSize;			// Total elements of class 0

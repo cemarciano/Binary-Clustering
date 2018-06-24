@@ -127,10 +127,12 @@ void Matrix::allocateSpace(bool extraArrays){
 		m_class = new Bitmask(m_rows);
 		// Allocates space for cluster array:
 		m_cluster = new int[m_rows]();
+		// Calculates total number of clusters:
+		int totalClusters = pow(K, m_columns);
 		// Allocates space for signal distribution:
-		m_signalDist = new int[ pow(K, m_columns)) ]();
+		m_signalDist = new int[totalClusters]();
 		// Allocates space for background distribution:
-		m_backgroundDist = new int[ pow(K, m_columns)) ]();
+		m_backgroundDist = new int[totalClusters]();
 	}
 
 }
@@ -198,13 +200,13 @@ void Matrix::putClusterOf(int i, int cluster){
 
 
 // Retrieves the number of signal registers a cluster has:
-int getSignalDist(int cluster){
+int Matrix::getSignalDist(int cluster){
 	return m_signalDist[cluster];
 }
 
 
 // Retrieves the number of background registers a cluster has:
-int getBackgroundDist(int cluster){
+int Matrix::getBackgroundDist(int cluster){
 	return m_backgroundDist[cluster];
 }
 

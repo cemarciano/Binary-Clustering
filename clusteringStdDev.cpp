@@ -126,10 +126,6 @@ void binaryClustering(Matrix* matrix){
         powArr[i] = pow(K,i);
     }
 
-	// Arrays cointaining fraction of data in a cluster:
-	double* signalDist = new double[ pow(K, matrix->getDims()) ]();
-	double* backgroundDist = new double[ pow(K, matrix->getDims()) ]();
-
 
     // Array of threads:
 	std::thread splittingTasks[CORES];
