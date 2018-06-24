@@ -11,14 +11,12 @@
 using namespace std;
 
 
-int similar = 0;
-int chosen = 0;
 int* powArr;
 
 // Function declarations:
 void binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
-void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* matrix);
+void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
 
 
 // Main program:
@@ -113,38 +111,33 @@ void binaryClustering(Matrix* matrix){
 
 
 
-    /************************/
-    /*** SIMILARITY CHECK ***/
-    /************************/
+    /*************************/
+    /*** CLUSTER SPLITTING ***/
+    /*************************/
 
-    // Bitmask to hold unused similarity combinations (number of divisions ^ total dimensions):
-    Bitmask bitmask(pow(K,D+1), false);
 
-    // Array containing future indexes of bitmask:
-    powArr = new int[D];
+    // Array containing future indexes of clusters:
+    powArr = new int[ matrix->getColumns() ];
     // Fills the array with powers of the number of divisions:
-    for (int i = 0; i < D; i++){
+    for (int i = 0; i < matrix->getColumns(); i++){
         powArr[i] = pow(K,i);
     }
 
 
     // Array of threads:
-	std::thread similarityTasks[CORES];
+	std::thread splittingTasks[CORES];
 
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		similarityTasks[threadId] = thread(removeSimilar, threadId, &boundaries, &bitmask, matrix);
+		splittingTasks[threadId] = thread(clusterSplitting, threadId, &boundaries, matrix);
 	}
 
 	// Waits until all threads are done:
 	for (int threadId = 0; threadId < CORES; threadId++){
-		similarityTasks[threadId].join();
+		splittingTasks[threadId].join();
 	}
 
-    cout << endl << endl << "Selected items (count): " << chosen << endl;
-    cout << "Selected items (bitmask size): " << bitmask.getSize() << endl;
-    cout << "Similar items: " << similar << endl;
 
 }
 
@@ -190,7 +183,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 
 
 
-void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* matrix){
+void clusterSplitting(int threadId, Matrix* boundaries, Bitmask* Matrix* matrix){
 
     // Number of lines to check:
 	float each = N*1.0 / CORES;
@@ -218,13 +211,7 @@ void removeSimilar(int threadId, Matrix* boundaries, Bitmask* bitmask, Matrix* m
             }
         }
         //cout << "memAcc = " << memAcc << endl;
-        // Checks if similar data has not yet been found:
-        if (bitmask->get(memAcc) == false){
-            // Marks data as found:
-            bitmask->put(memAcc, true);
-            chosen++;
-        } else {
-            similar++;
-        }
+        // Assigns a cluster to the data:
+        marix->putClusterOf(i, memAcc);
     }
 }
