@@ -274,7 +274,7 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Calculates total registers in this cluster:
 		int clusterSize = matrix->getSignalDist(i) + matrix->getBackgroundDist(i);
 		// Obtains the total number of registers this cluster will yield:
-		cout << "Cluster " << i << " had " << clusterSize << " and will now yield " << clusterSize *= selectedPercentage << " registers." << endl;
+		cout << "Cluster " << i << " had " << clusterSize << " registers and will now yield " << (int) clusterSize*selectedPercentage << " registers." << endl;
 
 	}
 
