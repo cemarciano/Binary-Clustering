@@ -51,27 +51,8 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 	// Saves matrix layout:
 	m_inverted = columnsSeq;
 
-	if (m_inverted){
-		// Allocates *k* columns for the data matrix:
-		m_matrix = new data_t*[m_columns];
-		// Allocates *n* rows:
-		for (int j = 0; j < m_columns; j++){
-			m_matrix[j] = new data_t[m_rows];
-		}
-	} else {
-		// Allocates *n* rows for the data matrix:
-		m_matrix = new data_t*[m_rows];
-		// Allocates *k* columns:
-		for (int j = 0; j < m_rows; j++){
-			m_matrix[j] = new data_t[m_columns];
-        }
-	}
-
-	// Allocates space for bitmask of classes:
-	m_class = new Bitmask(m_rows);
-
-	// Allocates space for cluster array:
-	m_cluster = new int[m_rows]();
+	// Allocates storage space:
+	this->allocateSpace();
 
 
 	///////////////////////
@@ -105,6 +86,48 @@ Matrix::Matrix(const char* fileLocation, bool columnsSeq){
 }
 
 
+// Constructor, takes a N x D parameter and allocates space:
+Matrix::Matrix(int rows, int columns, bool columnsSeq){
+
+	// Sets up meta data:
+	m_rows = rows;
+	m_columns = columns;
+	m_inverted = columnsSeq;
+
+	// Allocates storage space:
+	this->allocateSpace();
+
+}
+
+
+// Uses previously set information to allocate storage space:
+void Matrix::allocateSpace(){
+	// Checks if columns should be stored sequentially:
+	if (m_inverted){
+		// Allocates *k* columns for the data matrix:
+		m_matrix = new data_t*[m_columns];
+		// Allocates *n* rows:
+		for (int j = 0; j < m_columns; j++){
+			m_matrix[j] = new data_t[m_rows];
+		}
+	} else {
+		// Allocates *n* rows for the data matrix:
+		m_matrix = new data_t*[m_rows];
+		// Allocates *k* columns:
+		for (int j = 0; j < m_rows; j++){
+			m_matrix[j] = new data_t[m_columns];
+        }
+	}
+
+	// Allocates space for bitmask of classes:
+	m_class = new Bitmask(m_rows);
+
+	// Allocates space for cluster array:
+	m_cluster = new int[m_rows]();
+
+}
+
+
 // Returns a value in the matrix:
 data_t Matrix::get(int i, int j){
 	if (m_inverted){
@@ -132,7 +155,7 @@ int getRows(){
 
 
 // Retrieves number of columns:
-int getColumns(){
+int getDims(){
 	return m_columns;
 }
 

@@ -53,9 +53,9 @@ void binaryClustering(Matrix* matrix){
     /****************************/
 
     // Allocates centroid array:
-    data_t* centroids = new data_t[ matrix->getColumns() ]();
+    data_t* centroids = new data_t[ matrix->getDims() ]();
 	// Allocates stddev array:
-    data_t* stdDev = new data_t[ matrix->getColumns() ]();
+    data_t* stdDev = new data_t[ matrix->getDims() ]();
 
     // Array of threads:
 	thread centroidTasks[CORES];
@@ -72,12 +72,12 @@ void binaryClustering(Matrix* matrix){
 	}
 
     // Prints centroid values:
-    for (int i = 0; i < D; i++){
+    for (int i = 0; i < matrix->getDims(); i++){
         cout << centroids[i] << " - ";
     }
 	cout << endl;
 	// Prints stddev values:
-    for (int i = 0; i < D; i++){
+    for (int i = 0; i < matrix->getDims(); i++){
         cout << stdDev[i] << " - ";
     }
 
@@ -86,7 +86,7 @@ void binaryClustering(Matrix* matrix){
     /***************************/
 
 	// Creates matrix D-DIMENSIONS by K-DIVISIONS:
-	Matrix boundaries(matrix->getColumns(), K);
+	Matrix boundaries(matrix->getDims(), K);
 
 	// Step to divide boundaries with:
 	float step;
@@ -99,7 +99,7 @@ void binaryClustering(Matrix* matrix){
 		step = -1*(1.0*(K - 2)/2);
 	}
 	// Runs through dimensions of matrix:
-	for (int i = 0; i < matrix->getColumns(); i++){
+	for (int i = 0; i < matrix->getDims(); i++){
 		// Runs through each division:
 		for (int j = 0; j < K-1; j++){
 			// Saves the value of the boundary:
@@ -117,9 +117,9 @@ void binaryClustering(Matrix* matrix){
 
 
     // Array containing future indexes of clusters:
-    powArr = new int[ matrix->getColumns() ];
+    powArr = new int[ matrix->getDims() ];
     // Fills the array with powers of the number of divisions:
-    for (int i = 0; i < matrix->getColumns(); i++){
+    for (int i = 0; i < matrix->getDims(); i++){
         powArr[i] = pow(K,i);
     }
 
@@ -144,7 +144,7 @@ void binaryClustering(Matrix* matrix){
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = (matrix->getColumns)*1.0 / CORES;
+	float each = (matrix->getDims)*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);

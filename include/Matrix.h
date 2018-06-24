@@ -12,6 +12,9 @@ class Matrix {
 		// Variable columnsSeq, if set, inverts storage format for columns and rows:
         Matrix(const char* fileLocation, bool columnsSeq=false);
 
+		// Constructor, takes a N x D parameter and allocates space:
+		Matrix(int rows, int columns, bool columnsSeq=false);
+
         // Retrieves a value in the matrix:
         data_t get(int i, int j);
 
@@ -22,7 +25,7 @@ class Matrix {
 		int getRows();
 
 		// Retrieves number of columns:
-		int getColumns();
+		int getDims();
 
 		// Retrieves class of data:
 		int getClassOf(int i);
@@ -39,6 +42,10 @@ class Matrix {
 		// Destructor:
         ~Matrix();
 
+	protected:
+
+		// Uses previously set information to allocate storage space:
+		void allocateSpace();
 
     private:
         data_t** m_matrix;			// Matrix to hold registers
