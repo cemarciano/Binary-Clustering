@@ -345,25 +345,28 @@ void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix){
     // Loops through designated lines:
 	for (int i = start; i < end; i++){
 
+		// Retrieves cluster of current register:
+		int cluster = matrix->getClusterOf(i);
+
 		// Checks this register belongs to class 0 (signal):
 		if (matrix->getClassOf(i) == 0){
 			// Gets how many more signal registers this cluster can still yield:
-			int yield = matrix->getSignalDist(matrix->getClusterOf(i));
+			int yield = matrix->getSignalDist(cluster);
 			// Checks if given cluster can still yield signal registers:
 			if (yield > 0){
 				// Subtracts signal yield for this cluster, effectively "taking" one register:
-				matrix->putSignalDist(yield-1);
+				matrix->putSignalDist(cluster, yield-1);
 				// Marks register i as chosen:
 				chosen->put(i+1, true);
 			}
 		// Case where register belongs to class 1 (background):
 		} else {
 			// Gets how many more background registers this cluster can still yield:
-			int yield = matrix->getBackgroundDist(matrix->getClusterOf(i));
+			int yield = matrix->getBackgroundDist(cluster);
 			// Checks if given cluster can still yield background registers:
 			if (yield > 0){
 				// Subtracts background yield for this cluster, effectively "taking" one register:
-				matrix->putBackgroundDist(yield-1);
+				matrix->putBackgroundDist(cluster, yield-1);
 				// Marks register i as chosen:
 				chosen->put(i+1, true);
 			}
