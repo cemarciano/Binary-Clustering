@@ -40,16 +40,19 @@ int main(){
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
 
+	// Prints part of the data matrix so we can look at it since it's so pretty:
 	data.print(0, 20);
 
+	// Prints how many registers were chosen:
+	cout.imbue(std::locale(""));
 	cout << endl << "Total registers chosen: " << chosen->getSize() << endl;
-	cout << "This represents " << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers" << endl;
+	cout << "This represents " << setprecision(4) << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers" << endl;
 
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-	cout << endl << "Elapsed time: " << elapsed << " seconds." << endl;
+	cout << endl << "Elapsed time: " << elapsed << " seconds." << endl << endl;
 
 
 }
