@@ -15,10 +15,11 @@ using namespace std;
 int* powArr;
 
 // Function declarations:
-void binaryClustering(Matrix* matrix);
+Bitmask* binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
 void checkContamination(int threadId, Matrix* matrix);
+void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix);
 void printArray(data_t* arr, int size);
 
 
@@ -34,12 +35,16 @@ int main(){
     cout << "Start!" << endl;
 
     // Runs binary clustering algorithm:
-    binaryClustering(&data);
-
-	data.print(0, 20);
+    Bitmask* chosen = binaryClustering(&data);
 
 	// Stops the stopwatch:
 	clock_gettime(CLOCK_MONOTONIC, &finish);
+
+	data.print(0, 20);
+
+	cout << endl << "Total registers chosen: " << chosen->getSize() << endl;
+	cout << "This represents " << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers" << endl;
+
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -51,7 +56,7 @@ int main(){
 
 
 
-void binaryClustering(Matrix* matrix){
+Bitmask* binaryClustering(Matrix* matrix){
 
     /****************************/
     /*** CENTROID CALCULATION ***/
@@ -161,6 +166,39 @@ void binaryClustering(Matrix* matrix){
 	for (int threadId = 0; threadId < CORES; threadId++){
 		contaminationTasks[threadId].join();
 	}
+
+
+	/***************************************/
+    /*** CHOOSES WHICH REGISTERS TO PICK ***/
+    /***************************************/
+
+
+	// Allocates bitmask to hold which registers were chosen:
+	Bitmask* chosen = new Bitmask(matrix->getRows());
+
+	// Array of threads:
+	std::thread pickerTasks[CORES];
+
+	// Loops through threads:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		// Fires up thread to fill matrix:
+		pickerTasks[threadId] = thread(pickRegisters, threadId, chosen, matrix);
+	}
+
+	// Waits until all threads are done:
+	for (int threadId = 0; threadId < CORES; threadId++){
+		pickerTasks[threadId].join();
+	}
+
+
+	// Deletes allocated space:
+	delete[] centroids;
+	delete[] stdDev;
+	delete[] powArr;
+
+	// Returns chosen data:
+	return chosen;
+
 }
 
 
@@ -291,6 +329,47 @@ void checkContamination(int threadId, Matrix* matrix){
 		matrix->putBackgroundDist(i, currentBackground);
 	}
 
+}
+
+
+// Job to pick which registers should be kept:
+void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix){
+
+    // Number of lines to check:
+	float each = (matrix->getRows())*1.0 / CORES;
+
+    // Calculates chunck:
+    int start = round(threadId*each);
+    int end = round((threadId+1)*each);
+
+    // Loops through designated lines:
+	for (int i = start; i < end; i++){
+
+		// Checks this register belongs to class 0 (signal):
+		if (matrix->getClassOf(i) == 0){
+			// Gets how many more signal registers this cluster can still yield:
+			int yield = matrix->getSignalDist(matrix->getClusterOf(i));
+			// Checks if given cluster can still yield signal registers:
+			if (yield > 0){
+				// Subtracts signal yield for this cluster, effectively "taking" one register:
+				matrix->putSignalDist(yield-1);
+				// Marks register i as chosen:
+				chosen->put(i+1, true);
+			}
+		// Case where register belongs to class 1 (background):
+		} else {
+			// Gets how many more background registers this cluster can still yield:
+			int yield = matrix->getBackgroundDist(matrix->getClusterOf(i));
+			// Checks if given cluster can still yield background registers:
+			if (yield > 0){
+				// Subtracts background yield for this cluster, effectively "taking" one register:
+				matrix->putBackgroundDist(yield-1);
+				// Marks register i as chosen:
+				chosen->put(i+1, true);
+			}
+		}
+
+	}
 }
 
 
