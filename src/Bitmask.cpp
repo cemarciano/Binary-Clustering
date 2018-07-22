@@ -30,7 +30,7 @@ bool Bitmask::get(int i){
 void Bitmask::put(int i, bool value){
 	// Returns immediately in case position i is outside allocated boundaries:
     if ((i<1) || (i>bitmaskLength)){
-        cout << "ERRO: Acesso a indice indefinido no Bitmask." << endl;
+        cout << "ERRO: Acesso a indice indefinido no Bitmask (indice " << i << ")" << endl;
         return;
     }
     // Puts value in the i-th position:
