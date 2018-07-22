@@ -276,7 +276,10 @@ void Matrix::print(int startRow, int endRow){
         }
         cout << "]";
 		// Only prints extra array info if they have been previously allocated:
-		if (m_extraArrays == true) cout << " ---- Class " << this->getClassOf(i) << ", Cluster " << this->getClusterOf(i) << endl;
+		if (m_extraArrays == true) {
+			cout << " ---- Class " << this->getClassOf(i) << ", Cluster " << this->getClusterOf(i);
+		}
+		cout << endl;
     }
     cout << endl;
 }
