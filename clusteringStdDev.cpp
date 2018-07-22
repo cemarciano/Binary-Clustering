@@ -12,7 +12,7 @@
 using namespace std;
 
 
-int* powArr;
+int* powArr;					// Array to hold pre-calculated powers in base K
 
 // Function declarations:
 Bitmask* binaryClustering(Matrix* matrix);
@@ -46,7 +46,7 @@ int main(){
 	// Prints how many registers were chosen:
 	cout.imbue(std::locale(""));
 	cout << endl << "Total registers chosen: " << chosen->getSize() << endl;
-	cout << "This represents " << setprecision(4) << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers" << endl;
+	cout << "This represents " << setprecision(4) << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers." << endl;
 
 
 	// Prints out elapsed time:
@@ -120,6 +120,10 @@ Bitmask* binaryClustering(Matrix* matrix){
         // Adds infinity as last boundary:
         boundaries.put(i, K-1, numeric_limits<data_t>::infinity());
 	}
+
+	// Prints boundaries matrix:
+	cout << endl << "Boundaries:" << endl;
+	boundaries.print(0, 3);
 
 
 
