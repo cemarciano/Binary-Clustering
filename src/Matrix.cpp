@@ -136,6 +136,11 @@ void Matrix::allocateSpace(bool extraArrays){
 		m_backgroundDist = new int[totalClusters]();
 		// Allocates space for bitmask of contamination:
 		m_contamination = new Bitmask(totalClusters);
+		// Signals that this matrix has extra information:
+		m_extraArrays = true;
+	} else {
+		// Signals that this matrix doesn't have extra information:
+		m_extraArrays = false;
 	}
 
 }
@@ -269,7 +274,9 @@ void Matrix::print(int startRow, int endRow){
                  cout << '\t';
             }
         }
-        cout << "] ---- Class " << this->getClassOf(i) << ", Cluster " << this->getClusterOf(i) << endl;
+        cout << "]";
+		// Only prints extra array info if they have been previously allocated:
+		if (m_extraArrays == true) cout << " ---- Class " << this->getClassOf(i) << ", Cluster " << this->getClusterOf(i) << endl;
     }
     cout << endl;
 }

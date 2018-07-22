@@ -84,6 +84,7 @@ class Matrix {
 		int m_signalSize;				// Total elements of class 0
 		int m_backgroundSize;			// Total elements of class 1
 		bool m_inverted;				// If set, columns will be stored sequentially
+		bool m_extraArrays;				// Signals whether this matrix holds space for the extra arrays (cluster, contamination, etc)
 };
 
 #endif // MATRIX_H
