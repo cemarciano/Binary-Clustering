@@ -122,8 +122,8 @@ Bitmask* binaryClustering(Matrix* matrix){
 	}
 
 	// Prints boundaries matrix:
-	cout << endl << "Boundaries:" << endl;
-	boundaries.print(0, 3);
+	cout << endl << "Boundaries:";
+	boundaries.print(0, 9);
 
 
 
@@ -270,7 +270,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
             // Loops through boundaries:
             for (int k = 0; k < K; k++){
                 // Checks if data is to the left of boundary:
-                if (matrix->get(i, j) < boundaries->get(j,k)){
+                if (matrix->get(i, j) < boundaries->get(j, k)){
                     // Moves the memory position further (sets 1 in bitmask, represented in 10s):
                     memAcc += powArr[j]*k;
                     break;
