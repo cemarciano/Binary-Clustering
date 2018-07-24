@@ -123,7 +123,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 
 	// Prints boundaries matrix:
 	cout << endl << "Boundaries:";
-	boundaries.print(0, 9);
+	boundaries.print(0, 10);
 
 
 
@@ -213,7 +213,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix){
 
     // Number of columns to sum:
-	float each = (matrix->getDims())*1.0 / CORES;
+	double each = (matrix->getDims())*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -255,7 +255,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 
     // Number of lines to check:
-	float each = (matrix->getRows())*1.0 / CORES;
+	double each = (matrix->getRows())*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
@@ -288,7 +288,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 void checkContamination(int threadId, Matrix* matrix){
 
 	// Number of chuncks to check:
-	float each = (pow(K, matrix->getDims()))*1.0 / CORES;
+	double each = (pow(K, matrix->getDims()))*1.0 / CORES;
     // Calculates chunck:
     int start = round(threadId*each);
     int end = round((threadId+1)*each);
@@ -343,7 +343,7 @@ void checkContamination(int threadId, Matrix* matrix){
 void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix){
 
     // Number of lines to check:
-	float each = (matrix->getRows())*1.0 / CORES;
+	double each = (matrix->getRows())*1.0 / CORES;
 
     // Calculates chunck:
     int start = round(threadId*each);
