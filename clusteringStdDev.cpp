@@ -48,6 +48,18 @@ int main(){
 	cout << endl << "Total registers chosen: " << chosen->getSize() << endl;
 	cout << "This represents " << setprecision(4) << (chosen->getSize()*1.0/data.getRows())*100 << "% of the previous " << data.getRows() << " registers." << endl;
 
+	// Saves the chosen array to file:
+	ofstream myFile;
+    myFile.open("/home/cemarciano/Documents/chosen.txt");
+    // Writes to file:
+    for (int i = 1; i <= chosen->getLength(); i++){
+        if (chosen->get(i) == true){
+            myFile << "1" << endl;
+        } else {
+			myFile << "0" << endl;
+		}
+    }
+    myFile.close();
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
