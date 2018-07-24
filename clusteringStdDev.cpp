@@ -330,7 +330,7 @@ void checkContamination(int threadId, Matrix* matrix){
 		clusterSize *= (selectedPercentage*PERC_MULT);
 		// Calculates individual class yields within this cluster:
 		currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
-		currentBackground = clusterSize - currentSignal;
+		currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize ); //Alternative: clusterSize - currentSignal;
 		// Saves available quantity of registers:
 		matrix->putSignalDist(i, currentSignal);
 		matrix->putBackgroundDist(i, currentBackground);
