@@ -10,6 +10,7 @@ struct svm_problem prob;		// set by read_problem
 struct svm_model *model;
 struct svm_node *x_space;
 
+using namespace std;
 
 class SVM_Trainer {
     public:

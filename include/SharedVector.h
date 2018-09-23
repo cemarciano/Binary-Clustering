@@ -4,6 +4,7 @@
 #include <vector>
 #include <global.h>
 
+using namespace std;
 
 template <class T> class SharedVector {
     public:
