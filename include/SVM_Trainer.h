@@ -15,7 +15,7 @@ using namespace std;
 class SVM_Trainer {
     public:
 		// Constructor:
-        SVM_Trainer(Matrix* data, vector<int>* indexes, struct svm_parameter param);
+        SVM_Trainer(Matrix* matrixData, vector<int>* indexes, struct svm_parameter param);
 
 		// Destructor:
         ~SVM_Trainer();

@@ -7,16 +7,16 @@
 
 using namespace std;
 
-SVM_Trainer::SVM_Trainer(Matrix* data, vector<int>* indexes, struct svm_parameter param){
+SVM_Trainer::SVM_Trainer(Matrix* matrixData, vector<int>* indexes, struct svm_parameter param){
 
 	m_numRegisters = indexes->size(); //number of lines with labels
-	m_numDimensions = data->getDims(); //number of features for each data vector
+	m_numDimensions = matrixData->getDims(); //number of features for each data vector
 
-	vector<vector<data_t> data = this->generateData(data, indexes);
-	vector<int> labels = this->generateLabels(data, indexes);
+	vector<vector<data_t>> data = this->generateData(matrixData, indexes);
+	vector<int> labels = this->generateLabels(matrixData, indexes);
 
 	//initialize the size of the problem with just an int
-	prob.l = numRegisters;
+	prob.l = m_numRegisters;
 	//here we need to give some memory to our structures
 	// @param prob.l = number of labels
 	// @param m_numDimensions = number of features for each label
@@ -63,13 +63,13 @@ SVM_Trainer::SVM_Trainer(Matrix* data, vector<int>* indexes, struct svm_paramete
 
 
 // Function to transform data into the format used by the SVM program:
-vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, vector<int> indexes) {
+vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, vector<int>* indexes) {
 	// Vector to hold organized data:
 	vector<vector<data_t>> vecData;
 	// Loops through all assigned registers:
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
-		int index = indexes[i];
+		int index = (*indexes)[i];
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:

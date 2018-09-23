@@ -9,7 +9,7 @@ using namespace std;
 template <class T> class SharedVector {
     public:
 		// Constructor:
-        SharedVector<T>();
+        SharedVector(int numThreads);
 
 		// Retrieves the index-th value as if the vectors were a continous space:
 		T get(int index);
@@ -21,7 +21,7 @@ template <class T> class SharedVector {
 		int getSize();
 
 		// Destructor:
-        ~SharedVector<T>();
+        ~SharedVector();
     protected:
 
     private:

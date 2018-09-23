@@ -165,7 +165,8 @@ Bitmask* binaryClustering(Matrix* matrix){
 
 	// Creates one shared vector pointer for each cluster.
 	// A position in this array is a shared vector containing the IDs of the registers in this cluster:
-	SharedVector<int>** clusterPtrs = new SharedVector<int>*[pow(K,D)];
+	int totalClusters = pow(K,matrix->getDims());
+	SharedVector<int>** clusterPtrs = new SharedVector<int>*[totalClusters];
 
 
 
