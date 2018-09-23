@@ -7,7 +7,9 @@
 #include <iomanip>			// For printing arrays
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
+#include <fstream> 			// Handles file operations
 #include <unistd.h>
+#include "svm.h"			// SVM Program
 
 using namespace std;
 
@@ -21,6 +23,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
 void checkContamination(int threadId, Matrix* matrix);
 void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix);
 void printArray(data_t* arr, int size);
+struct svm_parameter setSVMParams();
 
 
 // Main program:
@@ -122,6 +125,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 		// Calculates initial step:
 		step = -1*(1.0*(K - 2)/2);
 	}
+	// PLEASE CHANGE LATER TO -1*((K/2) - 1)
 	// Runs through dimensions of matrix:
 	for (int i = 0; i < matrix->getDims(); i++){
 		// Runs through each division:
@@ -403,4 +407,29 @@ void printArray(data_t* arr, int size){
 		if (i != size-1) cout << '\t';
     }
 	cout << "]" << endl;
+}
+
+
+// Set all default parameters for param struct:
+struct svm_parameter setSVMParams(){
+	// Decares struct:
+	struct svm_parameter param;
+	// Sets parameters:
+	param.svm_type = C_SVC;
+	param.kernel_type = LINEAR;
+	param.degree = 3;
+	param.gamma = 1;	// 1/num_features
+	param.coef0 = 0;
+	param.nu = 0.5;
+	param.cache_size = 100;
+	param.C = 100;
+	param.eps = 1e-3;
+	param.p = 0.1;
+	param.shrinking = 1;
+	param.probability = 0;
+	param.nr_weight = 0;
+	param.weight_label = NULL;
+	param.weight = NULL;
+	// Returns struct:
+	return param;
 }
