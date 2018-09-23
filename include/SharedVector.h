@@ -5,10 +5,10 @@
 #include <global.h>
 
 
-template <class T> class SVM_Trainer {
+template <class T> class SharedVector {
     public:
 		// Constructor:
-        SharedVector();
+        SharedVector<T>();
 
 		// Retrieves the index-th value as if the vectors were a continous space:
 		T get(int index);
@@ -20,7 +20,7 @@ template <class T> class SVM_Trainer {
 		int getSize();
 
 		// Destructor:
-        ~SharedVector();
+        ~SharedVector<T>();
     protected:
 
     private:

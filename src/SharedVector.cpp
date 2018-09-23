@@ -1,6 +1,6 @@
 #include <SharedVector.h>
 
-using namespacestd;
+using namespace std;
 
 SharedVector<T>::SharedVector(int numThreads){
 	// Saves number of threads:
@@ -57,5 +57,5 @@ int SharedVector<T>::getSize(){
 
 
 // Destructor:
-SharedVector::~SharedVector(){
+SharedVector<T>::~SharedVector(){
 }
