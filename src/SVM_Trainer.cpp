@@ -63,7 +63,7 @@ SVM_Trainer::SVM_Trainer(Matrix* data, vector<int>* indexes, struct svm_paramete
 
 
 // Function to transform data into the format used by the SVM program:
-vector<vector<data_t>> generateData(Matrix* data, vector<int> indexes) {
+vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, vector<int> indexes) {
 	// Vector to hold organized data:
 	vector<vector<data_t>> vecData;
 	// Loops through all assigned registers:
@@ -75,7 +75,7 @@ vector<vector<data_t>> generateData(Matrix* data, vector<int> indexes) {
 		// Loops through all dimensions:
 		for (int j=0; j<m_numDimensions; ++j) {
 			// Retrieves attribute from the data matrix:
-			data_t attribute = Matrix->get(index, j);
+			data_t attribute = data->get(index, j);
 			// Adds attribute to the vector representing the register:
 			featureSet.push_back(attribute);
 		}
@@ -88,13 +88,13 @@ vector<vector<data_t>> generateData(Matrix* data, vector<int> indexes) {
 
 
 // Function to transform labels into the format used by the SVM program:
-vector<int> generateLabels(Matrix* data, vector<int>* indexes){
+vector<int> SVM_Trainer::generateLabels(Matrix* data, vector<int>* indexes){
 	// Vector to hold labels:
 	vector<int> labelsVec;
 	// Loops through assigned registers:
 	for (int i=0; i < indexes->size(); ++i) {
 		// Retrieves label (and adds 1 since SVM goes [1,inf) ):
-		int label = data->getClassOf(indexes[i]) + 1;
+		int label = data->getClassOf((*indexes)[i]) + 1;
 		// Adds label to labels vector:
 		labelsVec.push_back(label);
 	}

@@ -1,8 +1,8 @@
 #ifndef SVMTRAINER_H
 #define SVMTRAINER_H
 
-#include "Matrix.h"
 #include <vector>
+#include "Matrix.h"
 #include "svm.h"
 
 struct svm_parameter param;		// set by parse_command_line
