@@ -7,11 +7,18 @@
 #include <iomanip>			// For printing arrays
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
+#include "SharedVector.h"			// Data matrix class
 #include <fstream> 			// Handles file operations
 #include <unistd.h>
 #include "svm.h"			// SVM Program
 
 using namespace std;
+
+
+typedef struct {
+	int clusterId;
+	vector<int> registers;
+} clusterStruct;
 
 
 int* powArr;					// Array to hold pre-calculated powers in base K
@@ -154,6 +161,12 @@ Bitmask* binaryClustering(Matrix* matrix){
     for (int i = 0; i < matrix->getDims(); i++){
         powArr[i] = pow(K,i);
     }
+
+
+	// Creates one shared vector pointer for each cluster.
+	// A position in this array is a shared vector containing the IDs of the registers in this cluster:
+	SharedVector<int>** clusterPtrs = new SharedVector<int>*[pow(K,D)];
+
 
 
     // Array of threads:

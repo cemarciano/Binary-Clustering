@@ -101,3 +101,8 @@ vector<int> generateLabels(Matrix* data, vector<int>* indexes){
 	// Return labels vector:
 	return labelsVec;
 }
+
+
+// Destructor:
+SVM_Trainer::~SVM_Trainer(){
+}
