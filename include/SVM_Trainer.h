@@ -1,7 +1,7 @@
 #ifndef SVMTRAINER_H
 #define SVMTRAINER_H
 
-#include "Marix.h"
+#include "Matrix.h"
 #include <vector>
 #include "svm.h"
 

@@ -2,6 +2,7 @@
 
 using namespace std;
 
+template<class T>
 SharedVector<T>::SharedVector(int numThreads){
 	// Saves number of threads:
 	m_numThreads = numThreads;
@@ -33,6 +34,7 @@ T SharedVector<T>::get(int index){
 
 
 // Adds value to the vector owned by thread threadId:
+template<class T>
 void SharedVector<T>::push(T value, int threadId){
 	// Adds value to the corresponding vector:
 	m_vector[threadId].push_back(value);
@@ -40,6 +42,7 @@ void SharedVector<T>::push(T value, int threadId){
 
 
 // Returns total number of elements across all vectors:
+template<class T>
 int SharedVector<T>::getSize(){
 	// Accumulator variable:
 	int acc = 0;
@@ -57,5 +60,6 @@ int SharedVector<T>::getSize(){
 
 
 // Destructor:
+template<class T>
 SharedVector<T>::~SharedVector(){
 }

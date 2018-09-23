@@ -25,7 +25,7 @@ template <class T> class SharedVector {
 
     private:
 
-		vector<vector<T>>m_vector;	// Internal shared vector
+		vector<vector<T>> m_vector;		// Internal shared vector
 		int m_numThreads;				// Total number of threads
 };
 
