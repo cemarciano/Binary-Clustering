@@ -7,7 +7,7 @@
 #include <iomanip>			// For printing arrays
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
-#include "SharedVector.h"			// Data matrix class
+#include "SharedVector.h"	// Data matrix class
 #include <fstream> 			// Handles file operations
 #include <unistd.h>
 #include "svm.h"			// SVM Program
