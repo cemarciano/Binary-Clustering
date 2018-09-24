@@ -25,6 +25,8 @@ SharedVector<T>::SharedVector(int numThreads){
 template <class T>
 T SharedVector<T>::get(int index){
 	cout << "Hi! SharedVector taking over. My size is " << this->getSize() << endl;
+	cout << "My first vector has size " << m_vector[0].size() << endl;
+	cout << "My second vector has size " << m_vector[1].size() << endl;
 	// Checks which vector this index belongs to.
 	// Checks if subtracting vector size from index makes it negative:
 	int vec = 0;
