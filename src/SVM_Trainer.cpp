@@ -16,10 +16,10 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 	m_numRegisters = indexes->getSize(); //number of lines with labels
 	m_numDimensions = matrixData->getDims(); //number of features for each data vector
-
+	cout << "Dealing with organization" << endl;
 	vector<vector<data_t>> data = this->generateData(matrixData, indexes);
 	vector<int> labels = this->generateLabels(matrixData, indexes);
-
+	cout << "Finished dealing with organization" << endl;
 	//initialize the size of the problem with just an int
 	prob.l = m_numRegisters;
 	//here we need to give some memory to our structures
@@ -69,12 +69,14 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 // Function to transform data into the format used by the SVM program:
 vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>* indexes) {
+	cout << "Generating " << m_numRegisters << "data for SVM..." << endl;
 	// Vector to hold organized data:
 	vector<vector<data_t>> vecData;
 	// Loops through all assigned registers:
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
 		int index = indexes->get(i);
+		cout << "Found index " << index << endl;
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:
@@ -96,8 +98,9 @@ vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>
 vector<int> SVM_Trainer::generateLabels(Matrix* data, SharedVector<int>* indexes){
 	// Vector to hold labels:
 	vector<int> labelsVec;
+	cout << "Generating " << m_numRegisters << " labels" << endl;
 	// Loops through assigned registers:
-	for (int i=0; i < indexes->getSize(); ++i) {
+	for (int i=0; i < m_numRegisters; ++i) {
 		// Retrieves label (and adds 1 since SVM goes [1,inf) ):
 		int label = data->getClassOf(indexes->get(i)) + 1;
 		// Adds label to labels vector:
