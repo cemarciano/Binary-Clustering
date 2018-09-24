@@ -31,6 +31,8 @@ T SharedVector<T>::get(int index){
 	// Checks if subtracting vector size from index makes it negative:
 	int vec = 0;
 	while ((index - m_vector[vec].size()) > 0){
+		cout << "Index - m_vector[vec] = " << index << " - " << m_vector[vec].size() << " = " << index - m_vector[vec].size() << endl;
+		cin;
 		// Keeps searching:
 		index -= m_vector[vec].size();
 		vec++;
