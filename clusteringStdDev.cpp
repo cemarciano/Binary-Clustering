@@ -26,7 +26,7 @@ int* powArr;					// Array to hold pre-calculated powers in base K
 // Function declarations:
 Bitmask* binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
-void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix);
+void clusterSplitting(int threadId, Matrix* boundaries, SharedVector<int>** clusterPtrs, Matrix* matrix);
 void checkContamination(int threadId, Matrix* matrix);
 void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix);
 void printArray(data_t* arr, int size);
@@ -164,9 +164,9 @@ Bitmask* binaryClustering(Matrix* matrix){
 
 
 	// Creates one shared vector pointer for each cluster.
-	// A position in this array is a shared vector containing the IDs of the registers in this cluster:
+	// A position in this array is a shared vector containing the IDs of the registers in that cluster:
 	int totalClusters = pow(K,matrix->getDims());
-	SharedVector<int>** clusterPtrs = new SharedVector<int>*[totalClusters];
+	SharedVector<int>** clusterPtrs = new SharedVector<int>*[totalClusters]();
 
 
 
@@ -176,7 +176,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to fill matrix:
-		splittingTasks[threadId] = thread(clusterSplitting, threadId, &boundaries, matrix);
+		splittingTasks[threadId] = thread(clusterSplitting, threadId, &boundaries, clusterPtrs, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -282,7 +282,7 @@ void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matr
 
 
 // Job to assign a cluster number to each register:
-void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
+void clusterSplitting(int threadId, Matrix* boundaries, SharedVector<int>** clusterPtrs, Matrix* matrix){
 
     // Number of lines to check:
 	double each = (matrix->getRows())*1.0 / CORES;
@@ -310,6 +310,15 @@ void clusterSplitting(int threadId, Matrix* boundaries, Matrix* matrix){
 
         // Assigns a cluster to the data:
         matrix->putClusterOf(i, memAcc);
+
+		// Inserts data into corresponding cluster.
+		// Checks if cluster is empty:
+		if (clusterPtrs[memAcc] == NULL){
+			// Allocates space for this cluster:
+			clusterPtrs[memAcc] = new SharedVector<int>;
+		}
+		// Pushes register to cluster:
+		(clusterPtrs[memAcc])->push(i, threadId);
     }
 }
 
