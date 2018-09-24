@@ -4,6 +4,7 @@
 #include <vector>
 #include "Matrix.h"
 #include "svm.h"
+#include "SharedVector.h"
 
 struct svm_parameter param;		// set by parse_command_line
 struct svm_problem prob;		// set by read_problem
@@ -22,10 +23,10 @@ class SVM_Trainer {
     protected:
 
 		// Function to transform data into the format used by the SVM program:
-		vector<vector<data_t>> generateData(Matrix* data, vector<int>* indexes);
+		vector<vector<data_t>> generateData(Matrix* data, SharedVector<int>* indexes);
 
 		// Function to transform labels into the format used by the SVM program:
-		vector<int> generateLabels(Matrix* data, vector<int>* indexes);
+		vector<int> generateLabels(Matrix* data, SharedVector<int>* indexes);
 
     private:
 
