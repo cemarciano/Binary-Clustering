@@ -136,6 +136,8 @@ void Matrix::allocateSpace(bool extraArrays){
 		m_backgroundDist = new int[totalClusters]();
 		// Allocates space for bitmask of contamination:
 		m_contamination = new Bitmask(totalClusters);
+		// Allocates space for bitmask to check if cluster has both classes:
+		m_hasBothClasses = new Bitmask(totalClusters);
 		// Signals that this matrix has extra information:
 		m_extraArrays = true;
 	} else {
@@ -249,6 +251,17 @@ void Matrix::putContamination(int cluster, bool classBool){
 // Retrieves the class that contamines a cluster:
 bool Matrix::getContamination(int cluster){
 	return m_contamination->get(cluster+1);
+}
+
+// Sets cluster as having at least one element of each class:
+void Matrix::putHasBothClasses(int cluster, bool situation){
+	m_hasBothClasses->put(cluster+1, situation);
+}
+
+
+// Retrieves if cluster has at least one register of each class:
+bool Matrix::getHasBothClasses(int cluster){
+	return m_hasBothClasses->get(cluster+1);
 }
 
 

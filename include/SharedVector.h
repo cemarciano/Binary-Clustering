@@ -28,6 +28,8 @@ template <class T> class SharedVector {
 
 		vector<vector<T>> m_vector;		// Internal shared vector
 		int m_numThreads;				// Total number of threads
+		int m_size;						// Sum of size of vectors as if they were a huge vector
+		bool m_sizeHasChanged;			// True if an element has been added to the size since last calculation
 };
 
 #endif // SHAREDVECTOR_H

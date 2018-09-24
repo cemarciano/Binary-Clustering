@@ -233,6 +233,15 @@ Bitmask* binaryClustering(Matrix* matrix){
 	delete[] stdDev;
 	delete[] powArr;
 
+	// DELETE LATER PLS
+	int acc = 0;
+	for (int i=1; i<=pow(K, matrix->getDims()); i++){
+		if (matrix->getHasBothClasses(i) == true){
+			acc += 1;
+		}
+	}
+	cout << endl << endl << "Number of clusters having both classes: " << acc << endl;
+
 	// Returns chosen data:
 	return chosen;
 
@@ -350,6 +359,12 @@ void checkContamination(int threadId, Matrix* matrix){
 		} else {
 			// Sets cluster i as contamined by background (class 1):
 			matrix->putContamination(i, true);
+		}
+
+		// Checks if this cluster has at least one register of each class:
+		if (signalFraction > 0) && (backgroundFraction > 0) {
+			// Sets cluster as having at least one register of each class:
+			matrix->putHasBothClasses(i, true);
 		}
 
 		// Calculates a percentage of how much of this cluster should be retained:

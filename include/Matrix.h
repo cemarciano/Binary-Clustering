@@ -60,6 +60,12 @@ class Matrix {
 		// Retrieves the class that contamines a cluster:
 		bool getContamination(int cluster);
 
+		// Sets cluster as having at least one element of each class:
+		void putHasBothClasses(int cluster, bool situation);
+
+		// Retrieves if cluster has at least one register of each class:
+		bool getHasBothClasses(int cluster);
+
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
 
@@ -76,6 +82,7 @@ class Matrix {
         data_t** m_matrix;				// Matrix to hold registers
 		Bitmask* m_class;				// m_class of i returns the class register i-1 belongs to
 		Bitmask* m_contamination;		// m_contamination of i returns the class that contamines cluster i the most
+		Bitmask* m_hasBothClasses;		// m_hasBothClasses of i returns true if cluster i contains at least one register of each class
 		int* m_cluster;					// m_cluster of i returns the cluster register i belongs to
 		int* m_signalDist;				// m_signalDist of i returns the number of signal registers present in cluster i / m_signalSize
 		int* m_backgroundDist;			// m_backgroundDist of i returns the number of background registers present in cluster i / m_backgroundSize
