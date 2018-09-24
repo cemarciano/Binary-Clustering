@@ -197,7 +197,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to check contamination:
-		contaminationTasks[threadId] = thread(checkContamination, threadId, clusterPtrs, matrix);
+		contaminationTasks[threadId] = thread(checkContamination, threadId, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -215,7 +215,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to perform SVM tasks:
-		contaminationTasks[threadId] = thread(pickSupportVectors, threadId, matrix);
+		SVMTasks[threadId] = thread(pickSupportVectors, threadId, clusterPtrs, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -415,7 +415,7 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, Matrix* m
 	for (int i = start; i < end; i++){
 		// Checks if cluster is eligible for SVM task (i.e. has at least one register of both classes):
 		if (matrix->getHasBothClasses(i) == true){
-			
+
 		}
 	}
 

@@ -69,7 +69,7 @@ vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>
 	// Loops through all assigned registers:
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
-		int index = (*indexes)->get(i);
+		int index = indexes->get(i);
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:
@@ -94,7 +94,7 @@ vector<int> SVM_Trainer::generateLabels(Matrix* data, SharedVector<int>* indexes
 	// Loops through assigned registers:
 	for (int i=0; i < indexes->size(); ++i) {
 		// Retrieves label (and adds 1 since SVM goes [1,inf) ):
-		int label = data->getClassOf((*indexes)->get(i)) + 1;
+		int label = data->getClassOf(indexes->get(i)) + 1;
 		// Adds label to labels vector:
 		labelsVec.push_back(label);
 	}
