@@ -7,10 +7,10 @@
 #include <iomanip>			// For printing arrays
 #include "Bitmask.h"		// Array class for storing bits
 #include "Matrix.h"			// Data matrix class
-#include "SharedVector.h"	// Data matrix class
+#include "SharedVector.h"	// Vector to be used across multiple threads
+#include "SVM_Trainer.h"	// Performs SVM
 #include <fstream> 			// Handles file operations
 #include <unistd.h>
-#include "svm.h"			// SVM Program
 
 using namespace std;
 
@@ -419,7 +419,7 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 		// Checks if cluster is eligible for SVM task (i.e. has at least one register of both classes):
 		if (matrix->getHasBothClasses(i) == true){
 			// Fires up SVM:
-			struct svm_model = SVM_Trainer(matrix, clusterPtrs[i], param);
+			SVM_Trainer result(matrix, clusterPtrs[i], param);
 		}
 	}
 
