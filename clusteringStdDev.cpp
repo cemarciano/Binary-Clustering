@@ -28,7 +28,7 @@ Bitmask* binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void clusterSplitting(int threadId, Matrix* boundaries, SharedVector<int>** clusterPtrs, Matrix* matrix);
 void checkContamination(int threadId, Matrix* matrix);
-void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, Matrix* matrix);
+void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Matrix* matrix);
 void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix);
 void printArray(data_t* arr, int size);
 struct svm_parameter setSVMParams();
@@ -209,13 +209,16 @@ Bitmask* binaryClustering(Matrix* matrix){
     /*** SVM PICKING ***/
     /*******************/
 
+	// Sets SVM parameters:
+	struct svm_parameter param = setSVMParams();
+
 	// Array of threads:
 	std::thread SVMTasks[CORES];
 
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to perform SVM tasks:
-		SVMTasks[threadId] = thread(pickSupportVectors, threadId, clusterPtrs, matrix);
+		SVMTasks[threadId] = thread(pickSupportVectors, threadId, clusterPtrs, param, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -403,7 +406,7 @@ void checkContamination(int threadId, Matrix* matrix){
 
 
 // Job to perform SVM and retain support vectors:
-void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, Matrix* matrix){
+void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Matrix* matrix){
 
 	// Number of chuncks to check:
 	double each = (pow(K, matrix->getDims()))*1.0 / CORES;
@@ -415,7 +418,8 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, Matrix* m
 	for (int i = start; i < end; i++){
 		// Checks if cluster is eligible for SVM task (i.e. has at least one register of both classes):
 		if (matrix->getHasBothClasses(i) == true){
-
+			// Fires up SVM:
+			struct svm_model = SVM_Trainer(matrix, clusterPtrs[i], param);
 		}
 	}
 

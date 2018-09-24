@@ -9,7 +9,7 @@ using namespace std;
 
 SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param){
 
-	m_numRegisters = indexes->size(); //number of lines with labels
+	m_numRegisters = indexes->getSize(); //number of lines with labels
 	m_numDimensions = matrixData->getDims(); //number of features for each data vector
 
 	vector<vector<data_t>> data = this->generateData(matrixData, indexes);
@@ -92,7 +92,7 @@ vector<int> SVM_Trainer::generateLabels(Matrix* data, SharedVector<int>* indexes
 	// Vector to hold labels:
 	vector<int> labelsVec;
 	// Loops through assigned registers:
-	for (int i=0; i < indexes->size(); ++i) {
+	for (int i=0; i < indexes->getSize(); ++i) {
 		// Retrieves label (and adds 1 since SVM goes [1,inf) ):
 		int label = data->getClassOf(indexes->get(i)) + 1;
 		// Adds label to labels vector:
