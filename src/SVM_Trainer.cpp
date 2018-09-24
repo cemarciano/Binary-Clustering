@@ -69,7 +69,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 // Function to transform data into the format used by the SVM program:
 vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>* indexes) {
-	cout << "Generating " << m_numRegisters << "data for SVM..." << endl;
+	cout << "Generating " << m_numRegisters << " data for SVM..." << endl;
 	// Vector to hold organized data:
 	vector<vector<data_t>> vecData;
 	// Loops through all assigned registers:

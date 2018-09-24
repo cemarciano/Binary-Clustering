@@ -23,15 +23,18 @@ SharedVector<T>::SharedVector(int numThreads){
 // Retrieves the index-th value as if the vectors were a continous space:
 template <class T>
 T SharedVector<T>::get(int index){
+	cout << "Hi! SharedVector taking over" << endl;
 	// Checks which vector this index belongs to.
 	// Checks if subtracting vector size from index makes it negative:
 	int vec = 0;
 	while ((index - m_vector[vec].size()) > 0){
 		// Keeps searching:
+		cout << "Looking into vector " << vec << endl;
 		index -= m_vector[vec].size();
 		vec++;
 	}
 	// Returns the element from vector vec:
+	cout << "I found it in vector " << vec << endl;
 	return (m_vector[vec])[index-1];
 }
 
