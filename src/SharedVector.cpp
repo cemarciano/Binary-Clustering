@@ -56,10 +56,13 @@ int SharedVector<T>::getSize(){
 
 
 
-
-
-
 // Destructor:
 template<class T>
 SharedVector<T>::~SharedVector(){
 }
+
+
+// Instantiates relevant template types:
+template class SharedVector<int>;
+template class SharedVector<float>;
+template class SharedVector<double>;

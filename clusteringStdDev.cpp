@@ -315,7 +315,7 @@ void clusterSplitting(int threadId, Matrix* boundaries, SharedVector<int>** clus
 		// Checks if cluster is empty:
 		if (clusterPtrs[memAcc] == NULL){
 			// Allocates space for this cluster:
-			clusterPtrs[memAcc] = new SharedVector<int>;
+			clusterPtrs[memAcc] = new SharedVector<int>(CORES);
 		}
 		// Pushes register to cluster:
 		(clusterPtrs[memAcc])->push(i, threadId);
