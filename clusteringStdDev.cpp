@@ -418,11 +418,11 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 	// Loops through designated clusters:
 	for (int cluster = start; cluster < end; cluster++){
 		// Checks if cluster is eligible for SVM task (i.e. has at least one register of both classes):
-		if (matrix->getHasBothClasses(i) == true){
+		if (matrix->getHasBothClasses(cluster) == true){
 			// Fires up SVM:
 			SVM_Trainer result(matrix, clusterPtrs[cluster], param);
 			// Retrieves each support vector:
-			for (int i = 0; j < result.getTotalSV(); j++){
+			for (int i = 0; i < result.getTotalSV(); i++){
 				// Gets register index:
 				int regId = result.getSV(i);
 				// Marks register as chosen:
