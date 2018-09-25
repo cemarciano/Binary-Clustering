@@ -32,8 +32,9 @@ class SVM_Trainer {
 
     private:
 
-		int m_numRegisters; 		// Total number of registers
-		int m_numDimensions;		// Total number of dimensions
+		int m_numRegisters; 			// Total number of registers
+		int m_numDimensions;			// Total number of dimensions
+		SharedVector<int>* m_indexes;	// Real indices of data, in relation to data matrix
 		struct svm_problem m_prob;
 		struct svm_model* m_model;
 		struct svm_node* m_Xspace;

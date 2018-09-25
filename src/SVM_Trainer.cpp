@@ -9,14 +9,15 @@ using namespace std;
 
 
 
-SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param){
+SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param
 
-	m_numRegisters = indexes->getSize(); //number of lines with labels
+	m_indexes = indexes;
+	m_numRegisters = m_indexes->getSize(); //number of lines with labels
 	m_numDimensions = matrixData->getDims(); //number of features for each data vector
 
 	// Organizes data so this SVM library will accept it:
-	vector<vector<data_t>> data = this->generateData(matrixData, indexes);
-	vector<int> labels = this->generateLabels(matrixData, indexes);
+	vector<vector<data_t>> data = this->generateData(matrixData);
+	vector<int> labels = this->generateLabels(matrixData);
 
 	//initialize the size of the m_problem with just an int
 	m_prob.l = m_numRegisters;
@@ -41,7 +42,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 		//m_numDimensions from m_Xspace[j] to m_Xspace[j+data[i].size] get filled right after next line
 		m_prob.x[i] = &m_Xspace[j];
 		for (int k=0; k<data[i].size(); ++k, ++j) {
-			m_Xspace[j].index=indexes[k]; //index of value
+			m_Xspace[j].index=k+1; //index of value
 			m_Xspace[j].value=data[i][k]; //value
 		}
 		m_Xspace[j].index=-1;//state the end of data vector
@@ -56,7 +57,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 	m_model = svm_train(&m_prob, &param);
 
 	//print support vectors:
-	/*cout << "SV indexes:" << endl;
+	/*cout << "SV m_indexes:" << endl;
 	for (int i=0; i<29; i++){
 		cout << model->sv_indices[i] << endl;
 	}*/
@@ -65,13 +66,13 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 
 // Function to transform data into the format used by the SVM program:
-vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>* indexes) {
+vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data) {
 	// Vector to hold organized data:
 	vector<vector<data_t>> vecData;
 	// Loops through all assigned registers:
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
-		int index = indexes->get(i);
+		int index = m_indexes->get(i);
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:
@@ -90,13 +91,13 @@ vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>
 
 
 // Function to transform labels into the format used by the SVM program:
-vector<int> SVM_Trainer::generateLabels(Matrix* data, SharedVector<int>* indexes){
+vector<int> SVM_Trainer::generateLabels(Matrix* data){
 	// Vector to hold labels:
 	vector<int> labelsVec;
 	// Loops through assigned registers:
 	for (int i=0; i < m_numRegisters; ++i) {
 		// Retrieves label (and adds 1 since SVM goes [1,inf) ):
-		int label = data->getClassOf(indexes->get(i)) + 1;
+		int label = data->getClassOf(m_indexes->get(i)) + 1;
 		// Adds label to labels vector:
 		labelsVec.push_back(label);
 	}
@@ -112,9 +113,9 @@ int SVM_Trainer::getTotalSV(){
 }
 
 // Returns an array of indices corresponding to support vectors:
-int* SVM_Trainer::getSV(int i){
-	// Returns the indices array:
-	return m_model->sv_indices[i];
+int SVM_Trainer::getSV(int i){
+	// Returns the index in the data matrix corresponding to the i-th SV:
+	return m_indexes->get(m_model->sv_indices[i]);
 }
 
 
