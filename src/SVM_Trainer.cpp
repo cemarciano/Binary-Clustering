@@ -41,7 +41,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 		//m_numDimensions from m_Xspace[j] to m_Xspace[j+data[i].size] get filled right after next line
 		m_prob.x[i] = &m_Xspace[j];
 		for (int k=0; k<data[i].size(); ++k, ++j) {
-			m_Xspace[j].index=k+1; //index of value
+			m_Xspace[j].index=indexes[k]; //index of value
 			m_Xspace[j].value=data[i][k]; //value
 		}
 		m_Xspace[j].index=-1;//state the end of data vector
@@ -106,15 +106,15 @@ vector<int> SVM_Trainer::generateLabels(Matrix* data, SharedVector<int>* indexes
 
 
 // Returns the total number of support vectors:
-int SVM_Trainer::getNumOfSV(){
+int SVM_Trainer::getTotalSV(){
 	// Sums support vectors of both classes:
 	return m_model->l;
 }
 
 // Returns an array of indices corresponding to support vectors:
-int* SVM_Trainer::getIndicesOfSV(){
+int* SVM_Trainer::getSV(int i){
 	// Returns the indices array:
-	return m_model->sv_indices;
+	return m_model->sv_indices[i];
 }
 
 
