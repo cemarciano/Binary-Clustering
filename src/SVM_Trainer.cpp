@@ -35,7 +35,6 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 	//initialize the different lables with an array of labels
 	for (int i=0; i < prob.l; ++i) {
 		prob.y[i] = labels[i];
-		cout<<"prob.y["<<i<<"] = "<<prob.y[i]<<endl;
 	}
 	//initialize the svm_node vector with input data array as follows:
 	int j=0; //counter to traverse x_space[i];
@@ -76,7 +75,6 @@ vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data, SharedVector<int>
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
 		int index = indexes->get(i);
-		cout << "Found index " << index << endl;
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:

@@ -205,6 +205,13 @@ Bitmask* binaryClustering(Matrix* matrix){
 		contaminationTasks[threadId].join();
 	}
 
+	for (int i=0; i < pow(K, matrix->getDims()), i++){
+		if (matrix->getHasBothClasses() == true){
+			cout << "Cluster " << i << " has both classes. Signal dist is " matrix->getSignalDist(i) " and bg dist is " << matrix->getBackgroundDist(i) << endl;
+			cin.get();
+		}
+	}
+
 	/*******************/
     /*** SVM PICKING ***/
     /*******************/
