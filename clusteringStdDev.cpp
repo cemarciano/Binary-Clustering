@@ -205,9 +205,9 @@ Bitmask* binaryClustering(Matrix* matrix){
 		contaminationTasks[threadId].join();
 	}
 
-	for (int i=0; i < pow(K, matrix->getDims()), i++){
-		if (matrix->getHasBothClasses() == true){
-			cout << "Cluster " << i << " has both classes. Signal dist is " matrix->getSignalDist(i) " and bg dist is " << matrix->getBackgroundDist(i) << endl;
+	for (int i=0; i < pow(K, matrix->getDims()); i++){
+		if (matrix->getHasBothClasses(i) == true){
+			cout << "Cluster " << i << " has both classes. Signal dist is " << matrix->getSignalDist(i) << " and bg dist is " << matrix->getBackgroundDist(i) << endl;
 			cin.get();
 		}
 	}
@@ -382,6 +382,9 @@ void checkContamination(int threadId, Matrix* matrix){
 
 		// Checks if this cluster has at least one register of each class:
 		if ((signalFraction > 0) && (backgroundFraction > 0)) {
+			cout << "I am adding cluster " << i << ". Its signaldist is " << matrix->getSignalDist(i) << "and bgdist is " << matrix->getBackgroundDist(i) << endl;
+			cout << "Its signalFraction is " << signalFraction << " and bgfraction is " << backgroundFraction << endl;
+			cin.get(); 
 			// Sets cluster as having at least one register of each class:
 			matrix->putHasBothClasses(i, true);
 		}
