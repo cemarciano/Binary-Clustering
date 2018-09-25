@@ -73,6 +73,7 @@ vector<vector<data_t>> SVM_Trainer::generateData(Matrix* data) {
 	for (int i=0; i<m_numRegisters; ++i) {
 		// Retrieves the index of the register:
 		int index = m_indexes->get(i);
+		cout << "Got register " << index << " of class " << data->getClassOf(index) << endl;
 		// Vector to hold attributes:
 		vector<double> featureSet;
 		// Loops through all dimensions:
@@ -115,7 +116,7 @@ int SVM_Trainer::getTotalSV(){
 // Returns an array of indices corresponding to support vectors:
 int SVM_Trainer::getSV(int i){
 	// Returns the index in the data matrix corresponding to the i-th SV:
-	return m_indexes->get(m_model->sv_indices[i]);
+	return m_indexes->get(m_model->sv_indices[i]-1);
 }
 
 

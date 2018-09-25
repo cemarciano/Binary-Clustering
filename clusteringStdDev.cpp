@@ -423,7 +423,8 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 			SVM_Trainer result(matrix, clusterPtrs[i], param);
 			// Retrieves each support vector:
 			for (int j = 0; j < result.getTotalSV(); j++){
-				cout << "Got SV of index " << result.getSV(j) << " of class " << matrix->getClassOf(j) << endl;
+				int regId = result.getSV(j);
+				cout << "Got SV of index " << regId << " of class " << matrix->getClassOf(regId) << endl;
 			}
 			cin.get();
 		}
