@@ -52,7 +52,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 
 	//try to actually execute it
-	model = svm_train(&m_prob, &param);
+	m_model = svm_train(&m_prob, &param);
 
 	//print support vectors:
 	/*cout << "SV indexes:" << endl;

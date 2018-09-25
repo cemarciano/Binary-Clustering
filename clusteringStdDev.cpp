@@ -376,9 +376,6 @@ void checkContamination(int threadId, Matrix* matrix){
 
 		// Checks if this cluster has at least one register of each class:
 		if ((signalFraction > 0) && (backgroundFraction > 0)) {
-			cout << "I am adding cluster " << i << ". Its signaldist is " << matrix->getSignalDist(i) << "and bgdist is " << matrix->getBackgroundDist(i) << endl;
-			cout << "Its signalFraction is " << signalFraction << " and bgfraction is " << backgroundFraction << endl;
-			cin.get();
 			// Sets cluster as having at least one register of each class:
 			matrix->putHasBothClasses(i, true);
 		}
