@@ -439,7 +439,7 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 					// Subtracts background yield for this cluster, effectively "taking" one register:
 					matrix->putBackgroundDist(cluster, yield-1);
 				}
-				cout << "Got SV of index " << regId << " of class " << matrix->getClassOf(regId) << endl;
+				//cout << "Got SV of index " << regId << " of class " << matrix->getClassOf(regId) << endl;
 			}
 		}
 	}
