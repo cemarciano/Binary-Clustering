@@ -25,10 +25,10 @@ class SVM_Trainer {
     protected:
 
 		// Function to transform data into the format used by the SVM program:
-		vector<vector<data_t>> generateData(Matrix* data, SharedVector<int>* indexes);
+		vector<vector<data_t>> generateData(Matrix* data);
 
 		// Function to transform labels into the format used by the SVM program:
-		vector<int> generateLabels(Matrix* data, SharedVector<int>* indexes);
+		vector<int> generateLabels(Matrix* data);
 
     private:
 

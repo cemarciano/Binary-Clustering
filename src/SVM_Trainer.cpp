@@ -9,7 +9,7 @@ using namespace std;
 
 
 
-SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param
+SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param){
 
 	m_indexes = indexes;
 	m_numRegisters = m_indexes->getSize(); //number of lines with labels
