@@ -14,6 +14,12 @@ class SVM_Trainer {
 		// Constructor:
         SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param);
 
+		// Returns the total number of support vectors:
+		int getNumOfSV();
+
+		// Returns an array of indices corresponding to support vectors:
+		int* getIndicesOfSV();
+
 		// Destructor:
         ~SVM_Trainer();
     protected:
