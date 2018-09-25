@@ -28,7 +28,7 @@ Bitmask* binaryClustering(Matrix* matrix);
 void findCentroids(int threadId, data_t* centroids, data_t* stdDev, Matrix* matrix);
 void clusterSplitting(int threadId, Matrix* boundaries, SharedVector<int>** clusterPtrs, Matrix* matrix);
 void checkContamination(int threadId, Matrix* matrix);
-void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Matrix* matrix);
+void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Bitmask* chosen, Matrix* matrix);
 void pickRegisters(int threadId, Bitmask* chosen, Matrix* matrix);
 void printArray(data_t* arr, int size);
 struct svm_parameter setSVMParams();
@@ -210,6 +210,9 @@ Bitmask* binaryClustering(Matrix* matrix){
     /*** SVM PICKING ***/
     /*******************/
 
+	// Allocates bitmask to hold which registers were chosen:
+	Bitmask* chosen = new Bitmask(matrix->getRows());
+
 	// Sets SVM parameters:
 	struct svm_parameter param = setSVMParams();
 
@@ -219,7 +222,7 @@ Bitmask* binaryClustering(Matrix* matrix){
 	// Loops through threads:
 	for (int threadId = 0; threadId < CORES; threadId++){
 		// Fires up thread to perform SVM tasks:
-		SVMTasks[threadId] = thread(pickSupportVectors, threadId, clusterPtrs, param, matrix);
+		SVMTasks[threadId] = thread(pickSupportVectors, threadId, clusterPtrs, param, chosen, matrix);
 	}
 
 	// Waits until all threads are done:
@@ -231,9 +234,6 @@ Bitmask* binaryClustering(Matrix* matrix){
     /*** RANDOM PICKING ***/
     /**********************/
 
-
-	// Allocates bitmask to hold which registers were chosen:
-	Bitmask* chosen = new Bitmask(matrix->getRows());
 
 	// Array of threads:
 	std::thread pickerTasks[CORES];
@@ -407,7 +407,7 @@ void checkContamination(int threadId, Matrix* matrix){
 
 
 // Job to perform SVM and retain support vectors:
-void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Matrix* matrix){
+void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct svm_parameter param, Bitmask* chosen, Matrix* matrix){
 
 	// Number of chuncks to check:
 	double each = (pow(K, matrix->getDims()))*1.0 / CORES;
@@ -416,17 +416,31 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
     int end = round((threadId+1)*each);
 
 	// Loops through designated clusters:
-	for (int i = start; i < end; i++){
+	for (int cluster = start; cluster < end; cluster++){
 		// Checks if cluster is eligible for SVM task (i.e. has at least one register of both classes):
 		if (matrix->getHasBothClasses(i) == true){
 			// Fires up SVM:
-			SVM_Trainer result(matrix, clusterPtrs[i], param);
+			SVM_Trainer result(matrix, clusterPtrs[cluster], param);
 			// Retrieves each support vector:
-			for (int j = 0; j < result.getTotalSV(); j++){
-				int regId = result.getSV(j);
+			for (int i = 0; j < result.getTotalSV(); j++){
+				// Gets register index:
+				int regId = result.getSV(i);
+				// Marks register as chosen:
+				chosen->put(regId+1, true);
+				// Reduces total available registers to be picked according to class:
+				if (matrix->getClassOf(regId) == 0){
+					// Gets how many more signal registers this cluster can still yield:
+					int yield = matrix->getSignalDist(cluster);
+					// Subtracts signal yield for this cluster, effectively "taking" one register:
+					matrix->putSignalDist(cluster, yield-1);
+				} else {
+					// Gets how many more background registers this cluster can still yield:
+					int yield = matrix->getBackgroundDist(cluster);
+					// Subtracts background yield for this cluster, effectively "taking" one register:
+					matrix->putBackgroundDist(cluster, yield-1);
+				}
 				cout << "Got SV of index " << regId << " of class " << matrix->getClassOf(regId) << endl;
 			}
-			cin.get();
 		}
 	}
 
