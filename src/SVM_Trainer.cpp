@@ -7,10 +7,7 @@
 
 using namespace std;
 
-struct svm_parameter param;		// set by parse_command_line
-struct svm_problem prob;		// set by read_problem
-struct svm_model *model;
-struct svm_node *x_space;
+
 
 SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct svm_parameter param){
 
@@ -20,34 +17,34 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 	vector<vector<data_t>> data = this->generateData(matrixData, indexes);
 	vector<int> labels = this->generateLabels(matrixData, indexes);
 	cout << "Finished dealing with organization" << endl;
-	//initialize the size of the problem with just an int
-	prob.l = m_numRegisters;
+	//initialize the size of the m_problem with just an int
+	m_prob.l = m_numRegisters;
 	//here we need to give some memory to our structures
-	// @param prob.l = number of labels
+	// @param m_prob.l = number of labels
 	// @param m_numDimensions = number of features for each label
-	prob.y = Malloc(double,prob.l); //space for prob.l doubles
-	prob.x = Malloc(struct svm_node *, prob.l); //space for prob.l pointers to struct svm_node
-	x_space = Malloc(struct svm_node, (m_numDimensions+1) * prob.l); //memory for pairs of index/value
+	m_prob.y = Malloc(double,m_prob.l); //space for m_prob.l doubles
+	m_prob.x = Malloc(struct svm_node *, m_prob.l); //space for m_prob.l pointers to struct svm_node
+	m_Xspace = Malloc(struct svm_node, (m_numDimensions+1) * m_prob.l); //memory for pairs of index/value
 
 	//here we are going to initialize it all a bit
 
 
 	//initialize the different lables with an array of labels
-	for (int i=0; i < prob.l; ++i) {
-		prob.y[i] = labels[i];
+	for (int i=0; i < m_prob.l; ++i) {
+		m_prob.y[i] = labels[i];
 	}
 	//initialize the svm_node vector with input data array as follows:
-	int j=0; //counter to traverse x_space[i];
-	for (int i=0;i < prob.l; ++i) {
-		//set i-th element of prob.x to the address of x_space[j].
-		//m_numDimensions from x_space[j] to x_space[j+data[i].size] get filled right after next line
-		prob.x[i] = &x_space[j];
+	int j=0; //counter to traverse m_Xspace[i];
+	for (int i=0;i < m_prob.l; ++i) {
+		//set i-th element of m_prob.x to the address of m_Xspace[j].
+		//m_numDimensions from m_Xspace[j] to m_Xspace[j+data[i].size] get filled right after next line
+		m_prob.x[i] = &m_Xspace[j];
 		for (int k=0; k<data[i].size(); ++k, ++j) {
-			x_space[j].index=k+1; //index of value
-			x_space[j].value=data[i][k]; //value
+			m_Xspace[j].index=k+1; //index of value
+			m_Xspace[j].value=data[i][k]; //value
 		}
-		x_space[j].index=-1;//state the end of data vector
-		x_space[j].value=0;
+		m_Xspace[j].index=-1;//state the end of data vector
+		m_Xspace[j].value=0;
 
 		j++;
 
@@ -55,7 +52,7 @@ SVM_Trainer::SVM_Trainer(Matrix* matrixData, SharedVector<int>* indexes, struct 
 
 
 	//try to actually execute it
-	model = svm_train(&prob, &param);
+	model = svm_train(&m_prob, &param);
 
 	//print support vectors:
 	/*cout << "SV indexes:" << endl;

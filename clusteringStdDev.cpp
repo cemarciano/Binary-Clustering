@@ -205,12 +205,6 @@ Bitmask* binaryClustering(Matrix* matrix){
 		contaminationTasks[threadId].join();
 	}
 
-	for (int i=0; i < pow(K, matrix->getDims()); i++){
-		if (matrix->getHasBothClasses(i) == true){
-			cout << "Cluster " << i << " has both classes. Signal dist is " << matrix->getSignalDist(i) << " and bg dist is " << matrix->getBackgroundDist(i) << endl;
-			cin.get();
-		}
-	}
 
 	/*******************/
     /*** SVM PICKING ***/
@@ -384,7 +378,7 @@ void checkContamination(int threadId, Matrix* matrix){
 		if ((signalFraction > 0) && (backgroundFraction > 0)) {
 			cout << "I am adding cluster " << i << ". Its signaldist is " << matrix->getSignalDist(i) << "and bgdist is " << matrix->getBackgroundDist(i) << endl;
 			cout << "Its signalFraction is " << signalFraction << " and bgfraction is " << backgroundFraction << endl;
-			cin.get(); 
+			cin.get();
 			// Sets cluster as having at least one register of each class:
 			matrix->putHasBothClasses(i, true);
 		}
@@ -430,6 +424,7 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 		if (matrix->getHasBothClasses(i) == true){
 			// Fires up SVM:
 			SVM_Trainer result(matrix, clusterPtrs[i], param);
+			cin.get();
 		}
 	}
 

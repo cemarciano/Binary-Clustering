@@ -26,8 +26,11 @@ class SVM_Trainer {
 
     private:
 
-		int m_numRegisters; 	// Total number of registers
+		int m_numRegisters; 		// Total number of registers
 		int m_numDimensions;		// Total number of dimensions
+		struct svm_problem m_prob;
+		struct svm_model* m_model;
+		struct svm_node* m_Xspace;
 };
 
 #endif // SVMTRAINER_H

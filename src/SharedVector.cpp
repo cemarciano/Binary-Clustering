@@ -27,13 +27,13 @@ T SharedVector<T>::get(int index){
 	// Checks which vector this index belongs to.
 	// Checks if subtracting vector size from index makes it negative:
 	int vec = 0;
-	while (index > m_vector[vec].size()){
+	while (index >= m_vector[vec].size()){
 		// Keeps searching:
 		index -= m_vector[vec].size();
 		vec++;
 	}
 	// Returns the element from vector vec:
-	return (m_vector[vec])[index-1];
+	return (m_vector[vec])[index];
 }
 
 
