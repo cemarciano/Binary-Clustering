@@ -309,13 +309,17 @@ void Matrix::saveClusterDist(){
 		// Retrieves the registers in this cluster:
 		int totalDist = this->getSignalDist(i) + this->getBackgroundDist(i);
 		// Saves distribution data:
-		distArr[totalDist]++;
+		if (totalDist > m_signalSize+m_backgroundSize) || (totalDist < 0){
+			cout << "ERROR, cluster " << i << " has " << totalDist << " registers!!!" << endl;
+		}
+		distArr[totalDist] += 1;
 		// Checks if this cluster holds more register than the current known:
 		if ( totalDist > maxRegInCluster){
 			// Updates current known number of registers in a single cluster:
 			maxRegInCluster = totalDist;
 		}
 	}
+	cout << "Ive finished calculating distribution" << end;
 	// Opens file:
 	ofstream myFile;
     myFile.open("/home/cemarciano/Documents/clusterDist.txt");
