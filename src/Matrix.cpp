@@ -300,10 +300,11 @@ void Matrix::print(int startRow, int endRow){
 
 void Matrix::saveClusterDist(){
 	// Array of register distribution (distArr[i] returns how many clusters exist with i registers):
-	int* distArr = new int[m_numRegisters]();
+	int* distArr = new int[m_signalSize+m_backgroundSize]();
 	// Variable to hold maximum registers in a cluster:
 	int maxRegInCluster = 0;
 	// Retrieves maximum number of registers in a cluster:
+	int totalClusters = pow(K, m_columns);
 	for (int i = 0; i < totalClusters; i++){
 		// Retrieves the registers in this cluster:
 		int totalDist = this->getSignalDist(i) + this->getBackgroundDist(i);
