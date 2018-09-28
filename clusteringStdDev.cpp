@@ -72,8 +72,6 @@ int main(){
     }
     myFile.close();
 
-	// Saves cluster distribution:
-	data.saveClusterDist();
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -188,6 +186,8 @@ Bitmask* binaryClustering(Matrix* matrix){
 		splittingTasks[threadId].join();
 	}
 
+	// Saves cluster distribution:
+	matrix->saveClusterDist();
 
 
     /***************************************/
