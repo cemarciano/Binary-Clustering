@@ -300,7 +300,7 @@ void Matrix::print(int startRow, int endRow){
 
 void Matrix::saveClusterDist(){
 	// Array of register distribution (distArr[i] returns how many clusters exist with i registers):
-	int* distArr = new int[m_signalSize+m_backgroundSize]();
+	int* distArr = new int[m_signalSize+m_backgroundSize+1]();
 	// Variable to hold maximum registers in a cluster:
 	int maxRegInCluster = 0;
 	// Retrieves maximum number of registers in a cluster:
@@ -309,7 +309,7 @@ void Matrix::saveClusterDist(){
 		// Retrieves the registers in this cluster:
 		int totalDist = this->getSignalDist(i) + this->getBackgroundDist(i);
 		// Saves distribution data:
-		distArr[totalDist-1]++;
+		distArr[totalDist]++;
 		// Checks if this cluster holds more register than the current known:
 		if ( totalDist > maxRegInCluster){
 			// Updates current known number of registers in a single cluster:
@@ -321,8 +321,8 @@ void Matrix::saveClusterDist(){
     myFile.open("/home/cemarciano/Documents/clusterDist.txt");
 	// Writes to file the distribution of registers in clusters.
 	// E.g.: 1 300 means that 300 clusters have a single register in them.
-	for (int i = 1; i <= maxRegInCluster; i++){
-		myFile << i << " " << distArr[i-1] << endl;
+	for (int i = 0; i <= maxRegInCluster; i++){
+		myFile << i << " " << distArr[i] << endl;
 	}
     myFile.close();
 }
