@@ -297,6 +297,35 @@ void Matrix::print(int startRow, int endRow){
     cout << endl;
 }
 
+
+void Matrix::saveClusterDist(String location){
+	// Array of register distribution (distArr[i] returns how many clusters exist with i registers):
+	int* distArr = new int[m_numRegisters]();
+	// Variable to hold maximum registers in a cluster:
+	int maxRegInCluster = 0;
+	// Retrieves maximum number of registers in a cluster:
+	for (int i = 0; i < totalClusters; i++){
+		// Retrieves the registers in this cluster:
+		int totalDist = this->getSignalDist(i) + this->getBackgroundDist(i);
+		// Saves distribution data:
+		distArr[totalDist-1]++;
+		// Checks if this cluster holds more register than the current known:
+		if ( totalDist > maxRegInCluster){
+			// Updates current known number of registers in a single cluster:
+			maxRegInCluster = totalDist;
+		}
+	}
+	// Opens file:
+	ofstream myFile;
+    myFile.open(SAVE_PATH + location);
+	// Writes to file the distribution of registers in clusters.
+	// E.g.: 1 300 means that 300 clusters have a single register in them.
+	for (int i = 1; i <= maxRegInCluster; i++){
+		myFile << i << " " << distArr[i-1] << endl;
+	}
+    myFile.close();
+}
+
 // Destructor:
 Matrix::~Matrix(){
 

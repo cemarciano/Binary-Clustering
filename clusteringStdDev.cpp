@@ -61,7 +61,7 @@ int main(){
 
 	// Saves the chosen array to file:
 	ofstream myFile;
-    myFile.open("/home/cemarciano/Documents/chosen.txt");
+    myFile.open(SAVE_PATH + "chosen.txt");
     // Writes to file:
     for (int i = 1; i <= chosen->getLength(); i++){
         if (chosen->get(i) == true){
@@ -71,6 +71,9 @@ int main(){
 		}
     }
     myFile.close();
+
+	// Saves cluster distribution:
+	data.saveClusterDist("clusterDist.txt");
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);
@@ -439,7 +442,6 @@ void pickSupportVectors(int threadId, SharedVector<int>** clusterPtrs, struct sv
 					// Subtracts background yield for this cluster, effectively "taking" one register:
 					matrix->putBackgroundDist(cluster, yield-1);
 				}
-				//cout << "Got SV of index " << regId << " of class " << matrix->getClassOf(regId) << endl;
 			}
 		}
 	}

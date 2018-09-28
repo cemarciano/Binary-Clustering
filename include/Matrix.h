@@ -3,6 +3,7 @@
 
 #include "global.h"			// General configuration file
 #include "Bitmask.h"		// Array class for storing bits
+#include <string>			// Class for passing save file paths
 
 typedef double data_t;
 
@@ -68,6 +69,9 @@ class Matrix {
 
         // Prints all rows from [startRow, endRow):
         void print(int startRow, int endRow);
+
+		// Saves the distribution of registers in each cluster into a file at *location*:
+        void saveClusterDist(String location);
 
 		// Destructor:
         ~Matrix();
