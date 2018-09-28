@@ -401,6 +401,13 @@ void checkContamination(int threadId, Matrix* matrix){
 		// Calculates individual class yields within this cluster:
 		currentSignal = ( (signalFraction*1.0/totalFraction) * clusterSize );
 		currentBackground = ( (backgroundFraction*1.0/totalFraction) * clusterSize ); //Alternative: clusterSize - currentSignal;
+
+		// Checks if minimum number of selected registers is being respected:
+		if ((currentSignal < TAKE_AT_LEAST) && (currentBackground < TAKE_AT_LEAST)){
+			// Takes a minimum number of registers from each cluster:
+			currentSignal = TAKE_AT_LEAST;
+			currentBackground = TAKE_AT_LEAST;
+		}
 		// Saves available quantity of registers:
 		matrix->putSignalDist(i, currentSignal);
 		matrix->putBackgroundDist(i, currentBackground);
