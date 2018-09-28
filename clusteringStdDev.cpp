@@ -61,7 +61,7 @@ int main(){
 
 	// Saves the chosen array to file:
 	ofstream myFile;
-    myFile.open(SAVE_PATH + "chosen.txt");
+    myFile.open("/home/cemarciano/Documents/chosen.txt");
     // Writes to file:
     for (int i = 1; i <= chosen->getLength(); i++){
         if (chosen->get(i) == true){
@@ -73,7 +73,7 @@ int main(){
     myFile.close();
 
 	// Saves cluster distribution:
-	data.saveClusterDist("clusterDist.txt");
+	data.saveClusterDist();
 
 	// Prints out elapsed time:
     double elapsed = (finish.tv_sec - start.tv_sec);

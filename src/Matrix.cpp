@@ -298,7 +298,7 @@ void Matrix::print(int startRow, int endRow){
 }
 
 
-void Matrix::saveClusterDist(String location){
+void Matrix::saveClusterDist(){
 	// Array of register distribution (distArr[i] returns how many clusters exist with i registers):
 	int* distArr = new int[m_numRegisters]();
 	// Variable to hold maximum registers in a cluster:
@@ -317,7 +317,7 @@ void Matrix::saveClusterDist(String location){
 	}
 	// Opens file:
 	ofstream myFile;
-    myFile.open(SAVE_PATH + location);
+    myFile.open("/home/cemarciano/Documents/clusterDist.txt");
 	// Writes to file the distribution of registers in clusters.
 	// E.g.: 1 300 means that 300 clusters have a single register in them.
 	for (int i = 1; i <= maxRegInCluster; i++){
